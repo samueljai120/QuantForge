@@ -118,19 +118,17 @@ QF_ALLOW_LOCAL_RUNTIME=1 python3 scripts/quantforge_paper.py scan   # run a mark
 
 ---
 
-## Results & honest evaluation
+## Rigorous by design
 
-QuantForge is built not just to *find* a tradeable edge but to **rigorously verify any edge it claims** — and to report the truth when there isn't one. That evaluation discipline is a core feature, not an afterthought:
+Backtests lie. Most trading code overfits, leaks the future into the past, and ships a beautiful equity curve that evaporates the moment it goes live. QuantForge is engineered so that *can't* happen quietly:
 
-| Strategy | Out-of-sample verdict |
-|---|---|
-| Pooled funding-rate carry | **Validated** — market-neutral, ~3%/yr, Sharpe ≈ 3.2 unlevered (small at retail capital) |
-| Directional ML signals | No edge cleared the cost bar (OOS AUC ≈ 0.50) |
-| Cross-venue arbitrage | Sub-cost at retail execution |
+- **Leak-free, or it doesn't ship** — strictly chronological `TimeSeriesSplit`, enforced by a test that deliberately feeds a future-return feature and asserts the gate *rejects* it.
+- **A multi-criteria benchmark gate** — a signal must clear out-of-sample AUC, calibration, net-of-cost Sharpe, edge-vs-cost margin, and stability across multiple time windows before it can be promoted. It fails closed.
+- **Tamper-evident and human-gated** — every promotion and live-impacting change is recorded to a SHA-256 hash-chain and requires explicit approval; nothing mutates live state on its own.
 
-The headline finding — that free-data directional ML is a coin-flip out-of-sample, and the only durable edge is small market-neutral carry — is *exactly* the kind of result an overfit backtester hides. QuantForge surfaces it, with leak-free CV and an evidence-based verdict memo (`docs/QUANTFORGE_VERDICT.md`). A research system you can trust to tell you "no" is more valuable than one that always says "yes."
+Point it at a market, bring your own features and ideas, and QuantForge tells you — honestly, with the receipts — whether the edge is real *before* you risk a dollar. That discipline is the product. (Research notes from the bundled crypto study, including which strategies held up under cost, live in [`docs/QUANTFORGE_VERDICT.md`](docs/QUANTFORGE_VERDICT.md).)
 
-> **Not financial advice.** This is a paper-trading and research system. It has never executed a real trade. Do not deploy it with real funds without independent validation. Most cycle scripts refuse to run outside their configured production host unless `QF_ALLOW_LOCAL_RUNTIME=1` is set.
+> **Not financial advice.** This is a paper-trading and research system; it has never executed a real trade. Most cycle scripts refuse to run outside their configured host unless `QF_ALLOW_LOCAL_RUNTIME=1` is set.
 
 ---
 
