@@ -52,7 +52,7 @@ QF_ALLOW_LOCAL_RUNTIME=1 python3 scripts/quantforge_paper.py scan
 - Every gate rejects on uncertainty rather than silently passing — a missing key, an out-of-bounds number, or a missing file returns a non-zero exit.
 - Tamper-evident **SHA-256 hash-chained decision log**; an action gate that classifies every action by risk level; money-conservation invariants; a candidate-promotion pipeline.
 - A **config sentinel** AST-parses the live source and asserts the deployed policy bounds match the approved baseline — closing the "deployed ≠ live" gap at the code level.
-- Every live-impacting action (params, leverage, universe) is `HUMAN_GATED`: it emits a proposal artifact and stops.
+- Every action is classified by a **risk-tiered permission model** (`PermissionLevel`: reversible-op → config-proposal → code/model-change → financial-security). Anything above routine reversible operations is blocked from autonomous execution and routed through `requires_human_approval` — it emits a proposal artifact and stops.
 
 **✅ Engineering**
 - 95 Python modules, **148 tests green on Python 3.10 / 3.11 / 3.12** (CI matrix).
@@ -60,6 +60,10 @@ QF_ALLOW_LOCAL_RUNTIME=1 python3 scripts/quantforge_paper.py scan
 - A master verifier (`verify_quantforge.sh`) asserts the entire stack — docs, config sentinel, safety suite, sub-verifiers — and exits 0 only when the system is in a known-good, auditable state.
 
 ---
+
+## Operable by an LLM agent
+
+QuantForge ships as an **Agent Skill** ([`skills/quantforge/SKILL.md`](skills/quantforge/SKILL.md)) — the `SKILL.md` format used by Claude Code and the Claude Agent SDK. Drop it into a skills-compatible agent runtime and an LLM can run, monitor, and **safely tune** the platform: it heals operational issues autonomously, routes parameter changes through the proposal gate, sends code/model changes through the candidate pipeline, and **escalates anything touching risk limits, kill switches, real money, or credentials to a human**. The skill encodes the same fail-closed permission model the code enforces — the agent literally cannot do the dangerous things.
 
 ## Architecture
 
@@ -123,6 +127,7 @@ QuantForge/
   scripts/qf_mlops/      15 modules — MLOps (model registry, carry backtest, attribution)
   scripts/qf_safety/     13 modules — fail-closed safety core
   tests/                 32 test files (148 tests)
+  skills/                quantforge Agent Skill (SKILL.md) — operate it from an LLM agent
   docs/                  system state · loop protocol · evaluation verdict · roadmap
   verify_quantforge.sh   master verifier (exit 0 = stack green)
   setup.sh · .env.example · CLAUDE.md · CONTRIBUTING.md
