@@ -9,6 +9,22 @@
 
 QuantForge runs the full loop end to end: it ingests market data, engineers features, trains and validates ML models with leak-free cross-validation, allocates capital across regime-aware strategies, and governs its own changes through a tamper-evident, human-gated safety layer — then proposes its next round of research and repeats.
 
+<p align="center">
+  <img src="docs/assets/architecture.png" alt="QuantForge architecture: data → features → ML ensemble → benchmark gate → regime allocator → ledger, over a fail-closed safety core, with a self-evolving research loop" width="100%">
+</p>
+
+## See it run
+
+A live market scan pulls real prices off KuCoin, classifies the regime, and runs every candidate through the quality filter — which **fails closed**: with no cached history it refuses to signal rather than guess.
+
+<p align="center">
+  <img src="docs/assets/demo_scan.png" alt="Terminal: quantforge_paper.py scan — 20 coins screened, NEUTRAL regime, all SKIP on the quality filter, no actionable signals (fail-closed)" width="90%">
+</p>
+
+```bash
+QF_ALLOW_LOCAL_RUNTIME=1 python3 scripts/quantforge_paper.py scan
+```
+
 ---
 
 ## Highlights
@@ -47,40 +63,7 @@ QuantForge runs the full loop end to end: it ingests market data, engineers feat
 
 ## Architecture
 
-```
-                      ┌─────────────────────────────────────────────┐
-   market data  ───▶  │  feature engineering (technical · momentum · │
-   (KuCoin API)       │  vol · order-flow · funding/derivatives)     │
-                      └───────────────────────┬─────────────────────┘
-                                              ▼
-                      ┌─────────────────────────────────────────────┐
-                      │  ML training: XGBoost+LightGBM ensemble,     │
-                      │  walk-forward TimeSeriesSplit, per-symbol    │
-                      └───────────────────────┬─────────────────────┘
-                                              ▼
-                      ┌─────────────────────────────────────────────┐
-                      │  benchmark gate (AUC · calibration · Sharpe ·│
-                      │  edge-vs-cost · stability · anti-leakage)    │  ◀── fails closed
-                      └───────────────────────┬─────────────────────┘
-                                              ▼
-   regime detector ─▶ ┌─────────────────────────────────────────────┐
-   (6-state)          │  regime-aware allocator + strategy registry  │
-                      └───────────────────────┬─────────────────────┘
-                                              ▼
-                      ┌─────────────────────────────────────────────┐
-                      │  paper portfolio ledger · governance/audit   │
-                      └───────────────────────┬─────────────────────┘
-                                              ▼
-                      ┌─────────────────────────────────────────────┐
-                      │  qf_safety: action gate · invariants ·       │
-                      │  hash-chain decision log · HUMAN_GATED        │
-                      └─────────────────────────────────────────────┘
-                          ▲                                     │
-                          └──── self-reflection / feature ◀─────┘
-                               proposer / edge-discovery loop
-```
-
-Key modules:
+The pipeline diagram is at the top of this README. Module map:
 
 ```
 scripts/

@@ -1,0 +1,342 @@
+{
+  "ts": "2026-06-29T19:12:50.990860+00:00",
+  "regime": {
+    "computed_at": "2026-06-29T19:12:51.303399+00:00",
+    "source": "kucoin_btc_entropy",
+    "source_symbol": "BTC-USDT",
+    "lookback_bars": 240,
+    "score": 0.0082,
+    "label": "NEUTRAL",
+    "long_adj": 0.07,
+    "short_adj": 0.07,
+    "size_mult": 0.748,
+    "entropy": 0.772,
+    "entropy_label": "MIXED",
+    "entropy_penalty": 0.04,
+    "trend_strength": 0.0082,
+    "volatility": 0.0205,
+    "signals": {
+      "entropy_window": 72,
+      "trend_window": 48,
+      "vol_window": 24
+    },
+    "notes": [
+      "Trend strength is mixed, so thresholds stay defensive.",
+      "Mixed entropy keeps entries selective."
+    ]
+  },
+  "feedback": {
+    "summary": {
+      "window_hours": 72.0,
+      "recent_closes": 0,
+      "wins": 0,
+      "losses": 0,
+      "avg_pnl": 0.0,
+      "win_rate": 0.0,
+      "risk_mult": 1.0
+    },
+    "by_symbol": {},
+    "by_setup": {},
+    "by_symbol_setup": {}
+  },
+  "signals": [],
+  "results": [
+    {
+      "symbol": "BTC-USDT",
+      "status": "skip",
+      "reason": "quality filter \u2014 History 0 candles < 1500",
+      "quality_metrics": {
+        "quality_recent_24h_turnover": 5529233.0,
+        "quality_realized_vol_24h": 0.020442543583874078,
+        "quality_abs_move_24h_pct": 1.2676231561462803,
+        "quality_history_candles": 0,
+        "quality_score": 0.7399
+      }
+    },
+    {
+      "symbol": "ETH-USDT",
+      "status": "skip",
+      "reason": "quality filter \u2014 History 0 candles < 1500",
+      "quality_metrics": {
+        "quality_recent_24h_turnover": 14155070.0,
+        "quality_realized_vol_24h": 0.032472928144334015,
+        "quality_abs_move_24h_pct": 3.4849221167864597,
+        "quality_history_candles": 0,
+        "quality_score": 0.7291
+      }
+    },
+    {
+      "symbol": "SOL-USDT",
+      "status": "skip",
+      "reason": "quality filter \u2014 History 0 candles < 1500",
+      "quality_metrics": {
+        "quality_recent_24h_turnover": 18542327.0,
+        "quality_realized_vol_24h": 0.03455163965619128,
+        "quality_abs_move_24h_pct": 7.029978919966595,
+        "quality_history_candles": 0,
+        "quality_score": 0.7167
+      }
+    },
+    {
+      "symbol": "XRP-USDT",
+      "status": "skip",
+      "reason": "quality filter \u2014 History 0 candles < 1500",
+      "quality_metrics": {
+        "quality_recent_24h_turnover": 3250359.0,
+        "quality_realized_vol_24h": 0.02276457493112153,
+        "quality_abs_move_24h_pct": 2.1067859777537112,
+        "quality_history_candles": 0,
+        "quality_score": 0.7365
+      }
+    },
+    {
+      "symbol": "VELVET-USDT",
+      "status": "skip",
+      "reason": "quality filter \u2014 History 0 candles < 5000",
+      "quality_metrics": {
+        "quality_recent_24h_turnover": 1347035.0,
+        "quality_realized_vol_24h": 0.23952116062291282,
+        "quality_abs_move_24h_pct": 9.515274058691736,
+        "quality_history_candles": 0,
+        "quality_score": 0.6295
+      }
+    },
+    {
+      "symbol": "ZEC-USDT",
+      "status": "skip",
+      "reason": "quality filter \u2014 History 0 candles < 5000",
+      "quality_metrics": {
+        "quality_recent_24h_turnover": 5190458.0,
+        "quality_realized_vol_24h": 0.05325599953319828,
+        "quality_abs_move_24h_pct": 5.874450093517036,
+        "quality_history_candles": 0,
+        "quality_score": 0.7152
+      }
+    },
+    {
+      "symbol": "HYPE-USDT",
+      "status": "skip",
+      "reason": "quality filter \u2014 History 0 candles < 5000",
+      "quality_metrics": {
+        "quality_recent_24h_turnover": 2335160.0,
+        "quality_realized_vol_24h": 0.04473910536795749,
+        "quality_abs_move_24h_pct": 5.552062678338232,
+        "quality_history_candles": 0,
+        "quality_score": 0.7187
+      }
+    },
+    {
+      "symbol": "LAB-USDT",
+      "status": "skip",
+      "reason": "quality filter \u2014 History 0 candles < 5000",
+      "quality_metrics": {
+        "quality_recent_24h_turnover": 86091.0,
+        "quality_realized_vol_24h": 0.12023678251031453,
+        "quality_abs_move_24h_pct": 9.41166367900731,
+        "quality_history_candles": 0,
+        "quality_score": 0.4958
+      }
+    },
+    {
+      "symbol": "RAVE-USDT",
+      "status": "skip",
+      "reason": "quality filter \u2014 History 0 candles < 5000",
+      "quality_metrics": {
+        "quality_recent_24h_turnover": 2340776.0,
+        "quality_realized_vol_24h": 0.3401889682788859,
+        "quality_abs_move_24h_pct": 28.82304626897454,
+        "quality_history_candles": 0,
+        "quality_score": 0.5567
+      }
+    },
+    {
+      "symbol": "AAVE-USDT",
+      "status": "skip",
+      "reason": "quality filter \u2014 History 0 candles < 5000",
+      "quality_metrics": {
+        "quality_recent_24h_turnover": 7804500.0,
+        "quality_realized_vol_24h": 0.046083756878848595,
+        "quality_abs_move_24h_pct": 2.464476021314388,
+        "quality_history_candles": 0,
+        "quality_score": 0.7286
+      }
+    },
+    {
+      "symbol": "PEPE-USDT",
+      "status": "skip",
+      "reason": "quality filter \u2014 Price $0.0000 < $0.0100",
+      "quality_metrics": {
+        "quality_recent_24h_turnover": 5113506.0,
+        "quality_realized_vol_24h": 0.03556636701900564,
+        "quality_abs_move_24h_pct": 1.1904257572548094,
+        "quality_history_candles": 0,
+        "quality_score": 0.6359
+      }
+    },
+    {
+      "symbol": "NEAR-USDT",
+      "status": "skip",
+      "reason": "quality filter \u2014 History 0 candles < 5000",
+      "quality_metrics": {
+        "quality_recent_24h_turnover": 33082499.0,
+        "quality_realized_vol_24h": 0.04220397697141227,
+        "quality_abs_move_24h_pct": 3.176341730558585,
+        "quality_history_candles": 0,
+        "quality_score": 0.7274
+      }
+    },
+    {
+      "symbol": "SUI-USDT",
+      "status": "skip",
+      "reason": "quality filter \u2014 History 0 candles < 5000",
+      "quality_metrics": {
+        "quality_recent_24h_turnover": 8024960.0,
+        "quality_realized_vol_24h": 0.027739174830709062,
+        "quality_abs_move_24h_pct": 3.208241353936714,
+        "quality_history_candles": 0,
+        "quality_score": 0.7314
+      }
+    },
+    {
+      "symbol": "ADA-USDT",
+      "status": "skip",
+      "reason": "quality filter \u2014 History 0 candles < 2500",
+      "quality_metrics": {
+        "quality_recent_24h_turnover": 3558942.0,
+        "quality_realized_vol_24h": 0.028204793261598707,
+        "quality_abs_move_24h_pct": 2.9284012890570255,
+        "quality_history_candles": 0,
+        "quality_score": 0.7057
+      }
+    },
+    {
+      "symbol": "TAC-USDT",
+      "status": "skip",
+      "reason": "quality filter \u2014 History 0 candles < 5000",
+      "quality_metrics": {
+        "quality_recent_24h_turnover": 1126747.0,
+        "quality_realized_vol_24h": 0.518359059021694,
+        "quality_abs_move_24h_pct": 169.9921770742258,
+        "quality_history_candles": 0,
+        "quality_score": 0.4295
+      }
+    },
+    {
+      "symbol": "ENA-USDT",
+      "status": "skip",
+      "reason": "quality filter \u2014 History 0 candles < 5000",
+      "quality_metrics": {
+        "quality_recent_24h_turnover": 65386728.0,
+        "quality_realized_vol_24h": 0.04743727626860943,
+        "quality_abs_move_24h_pct": 4.635409748970654,
+        "quality_history_candles": 0,
+        "quality_score": 0.6604
+      }
+    },
+    {
+      "symbol": "DOGE-USDT",
+      "status": "skip",
+      "reason": "quality filter \u2014 History 0 candles < 2500",
+      "quality_metrics": {
+        "quality_recent_24h_turnover": 699199.0,
+        "quality_realized_vol_24h": 0.026904076086629716,
+        "quality_abs_move_24h_pct": 1.3033337906434461,
+        "quality_history_candles": 0,
+        "quality_score": 0.5681
+      }
+    },
+    {
+      "symbol": "AVAX-USDT",
+      "status": "skip",
+      "reason": "quality filter \u2014 History 0 candles < 2500",
+      "quality_metrics": {
+        "quality_recent_24h_turnover": 7703218.0,
+        "quality_realized_vol_24h": 0.03653794573742807,
+        "quality_abs_move_24h_pct": 6.067309211565819,
+        "quality_history_candles": 0,
+        "quality_score": 0.7193
+      }
+    },
+    {
+      "symbol": "RE-USDT",
+      "status": "skip",
+      "reason": "quality filter \u2014 History 0 candles < 5000",
+      "quality_metrics": {
+        "quality_recent_24h_turnover": 659007.0,
+        "quality_realized_vol_24h": 0.15410049465272946,
+        "quality_abs_move_24h_pct": 27.485322736267157,
+        "quality_history_candles": 0,
+        "quality_score": 0.5022
+      }
+    },
+    {
+      "symbol": "WIF-USDT",
+      "status": "skip",
+      "reason": "quality filter \u2014 History 0 candles < 5000",
+      "quality_metrics": {
+        "quality_recent_24h_turnover": 2105404.0,
+        "quality_realized_vol_24h": 0.05977162739240826,
+        "quality_abs_move_24h_pct": 7.409602845287511,
+        "quality_history_candles": 0,
+        "quality_score": 0.6988
+      }
+    }
+  ],
+  "flow": {
+    "scan_top_n": 20,
+    "screened_universe": 20,
+    "open_position_skips": 0,
+    "reentry_cooldown_skips": 0,
+    "loss_lockout_skips": 0,
+    "quality_passed": 0,
+    "quality_blocked": 20,
+    "model_no_signal": 0,
+    "threshold_miss": 0,
+    "trained_pair_blocked": 0,
+    "ml_gate_blocked": 0,
+    "selection_blocked": 0,
+    "feedback_blocked": 0,
+    "error_count": 0,
+    "actionable_signals": 0,
+    "buy_signals": 0,
+    "sell_signals": 0
+  },
+  "generated_at": "2026-06-29T19:12:50.990860+00:00",
+  "top_picks": [],
+  "pick_count": 0,
+  "summary": {
+    "counts": {
+      "signal": 0,
+      "hold": 0,
+      "skip": 20,
+      "error": 0,
+      "open_position": 0
+    },
+    "blocked_reasons": {
+      "quality filter \u2014 History 0 candles < 5000": 12,
+      "quality filter \u2014 History 0 candles < 1500": 4,
+      "quality filter \u2014 History 0 candles < 2500": 3,
+      "quality filter \u2014 Price $0.0000 < $0.0100": 1
+    }
+  },
+  "scan_top_n": 20,
+  "screened_universe": 20,
+  "open_position_skips": 0,
+  "reentry_cooldown_skips": 0,
+  "loss_lockout_skips": 0,
+  "quality_passed": 0,
+  "quality_blocked": 20,
+  "model_no_signal": 0,
+  "threshold_miss": 0,
+  "trained_pair_blocked": 0,
+  "ml_gate_blocked": 0,
+  "selection_blocked": 0,
+  "feedback_blocked": 0,
+  "error_count": 0,
+  "actionable_signals": 0,
+  "buy_signals": 0,
+  "sell_signals": 0,
+  "actionable": 0,
+  "signal_count": 0,
+  "result_count": 20
+}

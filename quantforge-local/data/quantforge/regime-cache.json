@@ -1,0 +1,25 @@
+{
+  "computed_at": "2026-06-29T19:12:51.303399+00:00",
+  "source": "kucoin_btc_entropy",
+  "source_symbol": "BTC-USDT",
+  "lookback_bars": 240,
+  "score": 0.0082,
+  "label": "NEUTRAL",
+  "long_adj": 0.07,
+  "short_adj": 0.07,
+  "size_mult": 0.748,
+  "entropy": 0.772,
+  "entropy_label": "MIXED",
+  "entropy_penalty": 0.04,
+  "trend_strength": 0.0082,
+  "volatility": 0.0205,
+  "signals": {
+    "entropy_window": 72,
+    "trend_window": 48,
+    "vol_window": 24
+  },
+  "notes": [
+    "Trend strength is mixed, so thresholds stay defensive.",
+    "Mixed entropy keeps entries selective."
+  ]
+}
