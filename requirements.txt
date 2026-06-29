@@ -1,0 +1,29 @@
+# QuantForge — Python dependencies
+# Generated from actual imports in scripts/ and tests/.
+# Install with: pip install -r requirements.txt
+
+# HTTP / exchange data
+requests>=2.28.0
+
+# Numerical / data
+numpy>=1.23.0
+pandas>=1.5.0
+scipy>=1.9.0
+
+# ML
+scikit-learn>=1.1.0
+xgboost>=1.7.0
+lightgbm>=3.3.0
+joblib>=1.2.0
+
+# Columnar / Parquet storage
+pyarrow>=10.0.0
+
+# Testing
+pytest>=7.0.0
+
+# Optional — MLflow experiment tracking (import is guarded; not required)
+# mlflow>=2.0.0
+
+# Optional — Supabase history sync (import is guarded; not required)
+# supabase>=1.0.0
