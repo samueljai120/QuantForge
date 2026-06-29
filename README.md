@@ -61,9 +61,33 @@ QF_ALLOW_LOCAL_RUNTIME=1 python3 scripts/quantforge_paper.py scan
 
 ---
 
-## Operable by an LLM agent
+## Operating it with an LLM agent
 
-QuantForge ships as an **Agent Skill** ([`skills/quantforge/SKILL.md`](skills/quantforge/SKILL.md)) — the `SKILL.md` format used by Claude Code and the Claude Agent SDK. Drop it into a skills-compatible agent runtime and an LLM can run, monitor, and **safely tune** the platform: it heals operational issues autonomously, routes parameter changes through the proposal gate, sends code/model changes through the candidate pipeline, and **escalates anything touching risk limits, kill switches, real money, or credentials to a human**. The skill encodes the same fail-closed permission model the code enforces — the agent literally cannot do the dangerous things.
+QuantForge is built to be driven by an autonomous LLM agent — it runs in production under a personal agent ("Hermes") — and the integration is two simple, agent-agnostic contracts you can wire to **any** agent runtime (Claude Code, the Claude Agent SDK, or your own).
+
+**1. Install the Agent Skill.** QuantForge ships an [Agent Skill](skills/quantforge/SKILL.md) in the standard `SKILL.md` format. Point your agent's skills directory at it:
+
+```bash
+# Claude Code / Agent SDK: skills are auto-discovered from the skills dir
+cp -r skills/quantforge ~/.claude/skills/        # or your runtime's skills path
+```
+
+The skill teaches the agent the command surface, the two-layer config, and — critically — the **fail-closed permission model**: it heals operational issues autonomously, routes parameter changes through the proposal gate, sends code/model changes through the candidate pipeline, and **escalates anything touching risk limits, kill switches, real money, or credentials to a human.** The agent literally cannot do the dangerous things.
+
+**2. Wire event-driven monitoring (optional).** On significant events (drawdown, regime flips, volatility spikes), QuantForge writes a small trigger file — an out-of-process agent polls it and runs deeper analysis only when there's something to look at (event-driven, not clock-driven). The path is set by `QF_ALERT_TRIGGER_FILE` (default `~/.quantforge/alert_trigger.json`):
+
+```jsonc
+// QF_ALERT_TRIGGER_FILE — written by QuantForge, consumed by your agent
+{
+  "ts": "2026-06-29T19:00:00+00:00",   // when it fired
+  "reasons": ["BTC down 1.0% in 1h", "vol spike ATR=0.061"],
+  "cooldown_h": 1.0,                     // adaptive: 0 on emergencies, up to 3h normally
+  "consumed": false,                     // your agent sets true after handling
+  "source": "quantforge_agent"
+}
+```
+
+A minimal monitor loop in any agent: poll the file → if `consumed == false` and the timestamp is fresh, load the QuantForge skill, investigate (`quantforge_paper.py status`, `quantforge_governance.py`), act within the permission tiers, mark `consumed: true`. That is exactly how the reference Hermes agent drives it.
 
 ## Architecture
 
