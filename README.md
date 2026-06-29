@@ -137,7 +137,7 @@ Backtests lie. Most trading code overfits, leaks the future into the past, and s
 - **A multi-criteria benchmark gate** — a signal must clear out-of-sample AUC, calibration, net-of-cost Sharpe, edge-vs-cost margin, and stability across multiple time windows before it can be promoted. It fails closed.
 - **Tamper-evident and human-gated** — every promotion and live-impacting change is recorded to a SHA-256 hash-chain and requires explicit approval; nothing mutates live state on its own.
 
-Point it at a market, bring your own features and ideas, and QuantForge tells you — honestly, with the receipts — whether the edge is real *before* you risk a dollar. That discipline is the product. (Research notes from the bundled crypto study, including which strategies held up under cost, live in [`docs/QUANTFORGE_VERDICT.md`](docs/QUANTFORGE_VERDICT.md).)
+Point it at a market, bring your own features and ideas, and QuantForge tells you — honestly, with the receipts — whether an edge is real *before* you risk a dollar. **That rigor is the product.** Full research notes and methodology live in [`docs/`](docs/).
 
 > **Not financial advice.** This is a paper-trading and research system; it has never executed a real trade. Most cycle scripts refuse to run outside their configured host unless `QF_ALLOW_LOCAL_RUNTIME=1` is set.
 
