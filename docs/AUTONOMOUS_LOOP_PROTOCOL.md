@@ -16,7 +16,7 @@ The loop runs these roles each cycle (one agent can play several; the *separatio
 concerns* is what matters, not the number of processes).
 
 ### 1. Planner
-- Reads `QUANTFORGE_SYSTEM_STATE.md` §8 + the knowledge ledger.
+- Reads `QUANTFORGE_SYSTEM_STATE.md` §8 + the prior decision log.
 - Converts the goal into the **smallest safe** concrete task with the highest expected
   value / risk ratio. Maintains the backlog. Never picks a task that requires live
   mutation or credentials without routing it through the Human Approval Gate first.
@@ -43,8 +43,8 @@ concerns* is what matters, not the number of processes).
 
 ### 6. Memory
 - Records every decision, rejected idea, accepted evidence, and known risk to:
-  - the **knowledge ledger** (`scripts/qf_knowledge_ledger.py`) — hypotheses + cost-honest
-    verdicts, so dead ends are never re-tried;
+  - `QUANTFORGE_SYSTEM_STATE.md` (§5/§6) — accepted and rejected findings, so dead ends
+    are never re-tried;
   - the **tamper-evident decision log** (`scripts/qf_safety/decision_log.py`);
   - `QUANTFORGE_SYSTEM_STATE.md` for the human-readable state.
 

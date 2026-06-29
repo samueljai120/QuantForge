@@ -41,8 +41,8 @@ QF_ALLOW_LOCAL_RUNTIME=1 python3 scripts/quantforge_paper.py scan
 
 **🔁 Autonomous research loop**
 - A self-reflection daemon reasons over realized performance and proposes parameter changes within safety bounds.
-- A feature proposer self-engineers candidate signals and an edge-discovery cycle tests each one leak-free on real OHLCV.
-- A research director orchestrates multi-slice campaigns; a self-evolution loop tunes the system — every change is gated, never auto-applied to live state.
+- A self-healing layer (`quantforge_self_heal_actions.py`) reads the system's own diagnostics and auto-fixes operational issues (stale data collectors, bad config) within safety limits.
+- A self-improvement loop (`qf_safety/self_improvement.py`) takes a proposed change through sandbox → safety tests → independent review → APPROVED, then **stops for a human to deploy** — autonomous up to the point of risk, never past it. A research director (`quantforge_research_director.py`) orchestrates multi-slice research campaigns.
 
 **🛠️ MLOps + persistence (`qf_mlops`)**
 - Model registry with atomic, content-addressed, versioned persistence (promotions are never silent).

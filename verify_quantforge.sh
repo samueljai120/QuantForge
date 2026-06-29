@@ -16,7 +16,7 @@ note "=== QuantForge master verification ==="
 for d in docs/QUANTFORGE_SYSTEM_STATE.md docs/AUTONOMOUS_LOOP_PROTOCOL.md; do
   if [ ! -s "$d" ]; then note "MISSING/empty: $d"; fail=1; fi
 done
-grep -q "Carry-Universe Verdict\|carry-universe verdict" docs/QUANTFORGE_SYSTEM_STATE.md 2>/dev/null \
+grep -qi "carry-universe verdict" docs/QUANTFORGE_SYSTEM_STATE.md 2>/dev/null \
   || { note "SYSTEM_STATE missing carry-universe verdict section"; fail=1; }
 for role in Planner Executor Critic "Red-Team" Verifier Memory "Human Approval Gate"; do
   grep -q "$role" docs/AUTONOMOUS_LOOP_PROTOCOL.md 2>/dev/null \
