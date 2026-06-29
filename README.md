@@ -3,9 +3,9 @@
 ![CI](https://github.com/samueljai120/QuantForge/actions/workflows/ci.yml/badge.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)
-![Tests](https://img.shields.io/badge/tests-148%20passing-brightgreen.svg)
+![Tests](https://img.shields.io/badge/tests-204%20passing-brightgreen.svg)
 
-**An autonomous crypto quant-research platform** — ML signal ensembles, regime-aware allocation, a funding-carry engine, a self-evolving research loop, and a fail-closed safety/MLOps stack. ~38,000 lines across 95 Python modules and 148 tests.
+**An autonomous crypto quant-research platform** — ML signal ensembles, regime-aware allocation, a funding-carry engine, a self-evolving research loop, and a fail-closed safety/MLOps stack. ~38,000 lines across 95 Python modules and 204 tests.
 
 QuantForge runs the full loop end to end: it ingests market data, engineers features, trains and validates ML models with leak-free cross-validation, allocates capital across regime-aware strategies, and governs its own changes through a tamper-evident, human-gated safety layer — then proposes its next round of research and repeats.
 
@@ -36,7 +36,7 @@ QF_ALLOW_LOCAL_RUNTIME=1 python3 scripts/quantforge_paper.py scan
 - Specialist models + a benchmark gate a candidate must clear before it can be promoted.
 
 **📊 Regime-aware allocation**
-- A 6-state market-regime classifier (`STRONG_BULL → STRONG_BEAR`) drives a pluggable strategy registry: trend/HODL, mean-reversion in chop, a leveraged futures lane, liquidation-dip, funding-carry, CVD momentum, volatility breakout, cross-asset, OI-divergence, and an ML scanner.
+- A 6-state allocation-regime taxonomy (`STRONG_BULL → STRONG_BEAR`, in `quantforge_agent.py`) drives a pluggable strategy registry: trend/HODL, mean-reversion in chop, a leveraged futures lane, liquidation-dip, funding-carry, CVD momentum, volatility breakout, cross-asset, OI-divergence, and an ML scanner.
 - A regime-weight table rebalances exposure as conditions shift; risk-adjusted position sizing with correlation penalties.
 
 **🔁 Autonomous research loop**
@@ -55,8 +55,8 @@ QF_ALLOW_LOCAL_RUNTIME=1 python3 scripts/quantforge_paper.py scan
 - Every action is classified by a **risk-tiered permission model** (`PermissionLevel`: reversible-op → config-proposal → code/model-change → financial-security). Anything above routine reversible operations is blocked from autonomous execution and routed through `requires_human_approval` — it emits a proposal artifact and stops.
 
 **✅ Engineering**
-- 95 Python modules, **148 tests green on Python 3.10 / 3.11 / 3.12** (CI matrix).
-- Leak-free evaluation enforced by a test that *deliberately* feeds a future-return feature and asserts the gate rejects it.
+- 95 Python modules, **204 tests green on Python 3.10 / 3.11 / 3.12** (CI matrix).
+- Leak-free evaluation: strictly chronological `TimeSeriesSplit`, labels computed as explicit forward-return shifts, look-ahead features excluded from training — and the ML gate fails closed when holdout metrics are missing or malformed (`tests/test_quantforge_ml_gate_truth.py`).
 - A master verifier (`verify_quantforge.sh`) asserts the entire stack — docs, config sentinel, safety suite, sub-verifiers — and exits 0 only when the system is in a known-good, auditable state.
 
 ---
@@ -76,7 +76,7 @@ scripts/
   quantforge_ml.py           XGBoost + LightGBM ensemble, walk-forward CV
   quantforge_ml_train.py     Extended trainer: TimeSeriesSplit + target-profile slicing
   quantforge_features.py     Feature engineering pipeline
-  quantforge_regime.py       6-state market-regime detector
+  quantforge_regime.py       Trend/volatility regime signal (BULL/BEAR/NEUTRAL + microstructure)
   quantforge_reflect.py      Self-reflection daemon — proposes param changes
   quantforge_research_director.py  Orchestrates multi-slice research campaigns
   quantforge_governance.py   Model/strategy health snapshots
@@ -86,7 +86,7 @@ scripts/
   config.py                  Env-driven config + runtime guard
 
 docs/    System state, autonomous-loop protocol, evaluation verdict, roadmap
-tests/   32 files, 148 tests — one per gate, invariant, and failure mode
+tests/   40 files, 204 tests — one per gate, invariant, and failure mode
 ```
 
 ---
@@ -97,7 +97,7 @@ tests/   32 files, 148 tests — one per gate, invariant, and failure mode
 git clone https://github.com/samueljai120/QuantForge.git
 cd QuantForge
 ./setup.sh                                    # venv + deps + .env
-python3 -m pytest tests/ -q                   # 148 tests
+python3 -m pytest tests/ -q                   # 204 tests
 QF_ALLOW_LOCAL_RUNTIME=1 python3 scripts/quantforge_paper.py scan   # run a market scan
 ```
 
@@ -109,7 +109,7 @@ QF_ALLOW_LOCAL_RUNTIME=1 python3 scripts/quantforge_paper.py scan   # run a mark
 
 Backtests lie. Most trading code overfits, leaks the future into the past, and ships a beautiful equity curve that evaporates the moment it goes live. QuantForge is engineered so that *can't* happen quietly:
 
-- **Leak-free, or it doesn't ship** — strictly chronological `TimeSeriesSplit`, enforced by a test that deliberately feeds a future-return feature and asserts the gate *rejects* it.
+- **Leak-free by construction** — strictly chronological `TimeSeriesSplit`; labels are explicit forward-return shifts and look-ahead features are excluded from training. The ML gate fails closed when holdout metrics are missing or malformed (proven by `tests/test_quantforge_ml_gate_truth.py`).
 - **A multi-criteria benchmark gate** — a signal must clear out-of-sample AUC, calibration, net-of-cost Sharpe, edge-vs-cost margin, and stability across multiple time windows before it can be promoted. It fails closed.
 - **Tamper-evident and human-gated** — every promotion and live-impacting change is recorded to a SHA-256 hash-chain and requires explicit approval; nothing mutates live state on its own.
 
@@ -126,7 +126,7 @@ QuantForge/
   scripts/               67 modules — engine, ML, allocation, research, governance
   scripts/qf_mlops/      15 modules — MLOps (model registry, carry backtest, attribution)
   scripts/qf_safety/     13 modules — fail-closed safety core
-  tests/                 32 test files (148 tests)
+  tests/                 40 test files (204 tests)
   skills/                quantforge Agent Skill (SKILL.md) — operate it from an LLM agent
   docs/                  system state · loop protocol · evaluation verdict · roadmap
   verify_quantforge.sh   master verifier (exit 0 = stack green)

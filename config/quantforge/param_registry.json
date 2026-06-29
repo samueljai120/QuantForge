@@ -1,0 +1,440 @@
+{
+  "hodl_mode": {
+    "type": "bool",
+    "default": false,
+    "owner": "agent",
+    "risk_class": "low",
+    "autonomous_allowed": true,
+    "rollback_value": false,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false
+  },
+  "fixed_alloc_pct": {
+    "type": "float",
+    "min": 0.4,
+    "max": 0.85,
+    "default": 0.55,
+    "owner": "allocator",
+    "risk_class": "low",
+    "autonomous_allowed": true,
+    "rollback_value": 0.55,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false
+  },
+  "rebalance_threshold": {
+    "type": "float",
+    "min": 0.02,
+    "max": 0.2,
+    "default": 0.08,
+    "owner": "agent",
+    "risk_class": "low",
+    "autonomous_allowed": true,
+    "rollback_value": 0.08,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false
+  },
+  "rebalance_cooldown_hours": {
+    "type": "int",
+    "min": 0,
+    "max": 48,
+    "default": 6,
+    "owner": "agent",
+    "risk_class": "low",
+    "autonomous_allowed": true,
+    "rollback_value": 6,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false
+  },
+  "max_rebalances_per_day": {
+    "type": "int",
+    "min": 1,
+    "max": 5,
+    "default": 2,
+    "owner": "agent",
+    "risk_class": "medium",
+    "autonomous_allowed": true,
+    "rollback_value": 2,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false
+  },
+  "regime_hysteresis_cycles": {
+    "type": "int",
+    "min": 2,
+    "max": 6,
+    "default": 3,
+    "owner": "agent",
+    "risk_class": "low",
+    "autonomous_allowed": true,
+    "rollback_value": 3,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false
+  },
+  "profit_take_pct": {
+    "type": "float",
+    "min": 0.1,
+    "max": 0.3,
+    "default": 0.1,
+    "owner": "agent",
+    "risk_class": "low",
+    "autonomous_allowed": true,
+    "rollback_value": 0.1,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false
+  },
+  "profit_take_increment": {
+    "type": "float",
+    "min": 0.05,
+    "max": 0.15,
+    "default": 0.1,
+    "owner": "agent",
+    "risk_class": "low",
+    "autonomous_allowed": true,
+    "rollback_value": 0.1,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false
+  },
+  "mr_oversold_z": {
+    "type": "float",
+    "min": -2.5,
+    "max": -0.3,
+    "default": -1.0,
+    "owner": "agent",
+    "risk_class": "low",
+    "autonomous_allowed": true,
+    "rollback_value": -1.0,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false
+  },
+  "mr_overbought_z": {
+    "type": "float",
+    "min": 0.3,
+    "max": 2.5,
+    "default": 1.0,
+    "owner": "agent",
+    "risk_class": "low",
+    "autonomous_allowed": true,
+    "rollback_value": 1.0,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false
+  },
+  "mr_weight": {
+    "type": "float",
+    "min": 0.0,
+    "max": 0.5,
+    "default": 0.3,
+    "owner": "agent",
+    "risk_class": "low",
+    "autonomous_allowed": true,
+    "rollback_value": 0.3,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false
+  },
+  "futures_weight": {
+    "type": "float",
+    "min": 0.0,
+    "max": 0.3,
+    "default": 0.05,
+    "owner": "risk",
+    "risk_class": "medium",
+    "autonomous_allowed": true,
+    "rollback_value": 0.05,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false
+  },
+  "consensus_ironclad": {
+    "type": "int",
+    "min": 5,
+    "max": 10,
+    "default": 8,
+    "owner": "agent",
+    "risk_class": "low",
+    "autonomous_allowed": true,
+    "rollback_value": 8,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false
+  },
+  "consensus_strong": {
+    "type": "int",
+    "min": 3,
+    "max": 10,
+    "default": 5,
+    "owner": "agent",
+    "risk_class": "low",
+    "autonomous_allowed": true,
+    "rollback_value": 5,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false,
+    "note": "agent also enforces consensus_strong <= consensus_ironclad"
+  },
+  "consensus_moderate": {
+    "type": "int",
+    "min": 2,
+    "max": 10,
+    "default": 3,
+    "owner": "agent",
+    "risk_class": "low",
+    "autonomous_allowed": true,
+    "rollback_value": 3,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false,
+    "note": "agent also enforces consensus_moderate <= consensus_strong"
+  },
+  "ml_scanner_weight": {
+    "type": "float",
+    "min": 0.0,
+    "max": 0.15,
+    "default": 0.05,
+    "owner": "ml",
+    "risk_class": "medium",
+    "autonomous_allowed": true,
+    "rollback_value": 0.05,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false
+  },
+  "ml_scanner_top_n": {
+    "type": "int",
+    "min": 1,
+    "max": 10,
+    "default": 5,
+    "owner": "ml",
+    "risk_class": "low",
+    "autonomous_allowed": true,
+    "rollback_value": 5,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false
+  },
+  "ml_scanner_min_confidence": {
+    "type": "float",
+    "min": 0.5,
+    "max": 0.8,
+    "default": 0.54,
+    "owner": "ml",
+    "risk_class": "low",
+    "autonomous_allowed": true,
+    "rollback_value": 0.54,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false
+  },
+  "funding_arb_weight": {
+    "type": "float",
+    "min": 0.0,
+    "max": 0.3,
+    "default": 0.05,
+    "owner": "risk",
+    "risk_class": "medium",
+    "autonomous_allowed": true,
+    "rollback_value": 0.05,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false
+  },
+  "regime_adaptive": {
+    "type": "bool",
+    "default": true,
+    "owner": "agent",
+    "risk_class": "low",
+    "autonomous_allowed": true,
+    "rollback_value": true,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false
+  },
+  "regime_weight_table": {
+    "type": "object",
+    "default": {},
+    "owner": "ewaa_proposer",
+    "risk_class": "medium",
+    "autonomous_allowed": true,
+    "rollback_value": {},
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false,
+    "note": "dict with 6 regime keys; agent validates structure",
+    "_note": "SINGLE-WRITE: only author=ewaa_proposer may write (enforced in param_proposal WEIGHT_AUTHORITY). 6 regime rows, per-row spot_alloc_pct is the HODL residual. autonomous, approval_required=false."
+  },
+  "swarm_regime": {
+    "type": "bool",
+    "default": true,
+    "owner": "agent",
+    "risk_class": "low",
+    "autonomous_allowed": true,
+    "rollback_value": true,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false
+  },
+  "micro_regime": {
+    "type": "bool",
+    "default": true,
+    "owner": "agent",
+    "risk_class": "low",
+    "autonomous_allowed": true,
+    "rollback_value": true,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false
+  },
+  "ml_btc_weight": {
+    "type": "float",
+    "min": 0.0,
+    "max": 0.15,
+    "default": 0.05,
+    "owner": "ml",
+    "risk_class": "medium",
+    "autonomous_allowed": true,
+    "rollback_value": 0.05,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": false
+  },
+  "futures_leverage": {
+    "type": "int",
+    "min": 1,
+    "max": 5,
+    "default": 3,
+    "owner": "risk",
+    "risk_class": "high",
+    "autonomous_allowed": false,
+    "rollback_value": 3,
+    "required_validation_tests": [
+      "backtest_gate",
+      "max_leverage_test"
+    ],
+    "approval_required": true,
+    "note": "leverage is a risk limit; changes escalate to a human"
+  },
+  "volatility_gate_atr": {
+    "type": "float",
+    "min": 0.02,
+    "max": 0.08,
+    "default": 0.035,
+    "owner": "risk",
+    "risk_class": "high",
+    "autonomous_allowed": false,
+    "rollback_value": 0.035,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": true,
+    "note": "risk gate that controls when leverage is reduced"
+  },
+  "ml_scanner_max_per_coin": {
+    "type": "float",
+    "min": 0.01,
+    "max": 0.05,
+    "default": 0.02,
+    "owner": "risk",
+    "risk_class": "high",
+    "autonomous_allowed": false,
+    "rollback_value": 0.02,
+    "required_validation_tests": [
+      "backtest_gate",
+      "max_position_test"
+    ],
+    "approval_required": true,
+    "note": "per-coin position size limit"
+  },
+  "funding_arb_max_positions": {
+    "type": "int",
+    "min": 1,
+    "max": 10,
+    "default": 3,
+    "owner": "risk",
+    "risk_class": "high",
+    "autonomous_allowed": false,
+    "rollback_value": 3,
+    "required_validation_tests": [
+      "backtest_gate"
+    ],
+    "approval_required": true,
+    "note": "max concurrent positions limit"
+  },
+  "funding_arb_position_size": {
+    "type": "float",
+    "min": 10.0,
+    "max": 500.0,
+    "default": 50.0,
+    "owner": "risk",
+    "risk_class": "high",
+    "autonomous_allowed": false,
+    "rollback_value": 50.0,
+    "required_validation_tests": [
+      "backtest_gate",
+      "max_position_test"
+    ],
+    "approval_required": true,
+    "note": "position size limit (USD)"
+  },
+  "panic_halt_pct": {
+    "type": "float",
+    "min": 0.05,
+    "max": 0.5,
+    "default": 0.15,
+    "owner": "risk",
+    "risk_class": "kill_switch",
+    "autonomous_allowed": false,
+    "rollback_value": 0.15,
+    "required_validation_tests": [
+      "panic_halt_test"
+    ],
+    "approval_required": true,
+    "note": "full-halt + liquidation circuit breaker; not in agent TUNABLE_KEYS (double protected)"
+  },
+  "drawdown_trim_pct": {
+    "type": "float",
+    "min": 0.05,
+    "max": 0.2,
+    "default": 0.08,
+    "owner": "risk",
+    "risk_class": "kill_switch",
+    "autonomous_allowed": false,
+    "rollback_value": 0.08,
+    "required_validation_tests": [
+      "max_drawdown_test"
+    ],
+    "approval_required": true,
+    "note": "drawdown circuit breaker; not in agent TUNABLE_KEYS (double protected)"
+  }
+}

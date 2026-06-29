@@ -61,7 +61,7 @@ LEVERAGE = 1                       # No leverage — pure HODL with smart sizing
 # Regime → target BTC allocation
 # v5 (2026-05-15): HODL-WITH-SAFETY-NETS mode.
 #
-# After 5 days of live trading we had clear per-regime alpha data and it was
+# After 5 days of live paper-trading we had clear per-regime alpha data and it was
 # unambiguous: every regime visited produced negative alpha vs passive HODL.
 # CHOP: -$45 alpha over 14 visits. BULL: -$11 alpha over 2 visits. Total
 # -$57 vs HODL while paying $10 in fees.
@@ -124,8 +124,8 @@ SPOT_FEE  = 0.001                  # KuCoin SPOT taker (0.10%) — spot fills ar
 _PERF_HISTORY_CACHE = {}  # keys: '_qf_perf_history' → list of equity values
 
 # OVER-TRADING FIX (2026-05-14):
-# After 4 days live, agent did 10 trades (mostly rebalancing on regime flips
-# every few hours) and lost $30 to fee drag. Adding three safeguards:
+# After 4 days of live paper cycles, the agent did 10 trades (mostly rebalancing on regime flips
+# every few hours) and lost $30 of simulated equity to fee drag. Adding three safeguards:
 #   1. Hysteresis: regime must persist for N consecutive cycles before acting
 #   2. Cooldown: minimum hours between any two rebalances
 #   3. Daily cap: max 2 rebalances per 24h window
@@ -1959,8 +1959,8 @@ def _execute_futures(port, price, futures_dir, regime, equity, signals=None, con
     # (which fires only when ALREADY correctly positioned), so a genuine LONG<->SHORT flip
     # was `LONG == SHORT` -> False -> it fell through to "Open new position" below, which
     # does `cash -= margin` and OVERWRITES futures_position — never crediting the old
-    # position's margin back. That ORPHANED the old margin (~$400 destroyed EVERY flip:
-    # 4 FUTURES_OPEN / 0 FUTURES_CLOSE in the live ledger) — the real driver of the
+    # position's margin back. That ORPHANED the old margin (~$400 of simulated margin lost EVERY flip:
+    # 4 FUTURES_OPEN / 0 FUTURES_CLOSE in the paper ledger) — the real driver of the
     # post-reset bleed, NOT "no edge". The old `== req_dir` branch also CHURNED a correct
     # position (close+reopen each cycle, resetting entry so no trend ever compounds); it
     # now HOLDS. _close_futures_position is a no-op when flat + fail-safe on bad price, so
