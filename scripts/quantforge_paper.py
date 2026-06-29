@@ -739,7 +739,7 @@ def autopilot_blocks_new_entries(autopilot: dict | None) -> bool:
 
 _sp = _load_strategy_params()
 
-# --- Risk-param allowlist bounds (2026-06-10) -------------------------------
+# --- Risk-param allowlist bounds  -------------------------------
 # strategy-params.json is writable by autotune/reflection/self-heal daemons.
 # Every risk-critical key is clamped here at load: a daemon (or LLM) can tune
 # WITHIN these bounds but can never loosen risk past them. Widening a bound is

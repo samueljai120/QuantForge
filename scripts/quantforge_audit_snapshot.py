@@ -46,12 +46,12 @@ AUDIT_FILES = [
     "strategy-params.json",
     "governance-report.json",
     "autopilot-report.json",
-    # v29 additions (2026-06-12): barbell satellite + autonomous research loop
+    # additions : barbell satellite + autonomous research loop
     "moonshot_state.json",
     "research_ledger.jsonl",
     "model/rebuild_verdict.json",
     "model/promotion_candidate.json",
-    # S1 (2026-06-16): cost-inclusive (time + fee honest) agent report
+    # S1 : cost-inclusive (time + fee honest) agent report
     "agent-cost-inclusive-report.json",
 ]
 

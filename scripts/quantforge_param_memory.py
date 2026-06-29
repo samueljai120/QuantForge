@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-QuantForge Param Memory — result-to-parameter memory system (v1).
+QuantForge Param Memory — result-to-parameter memory system.
 
 Stores snapshots of (regime, params, performance metrics) so the agent can
 recall which parameter combinations produced the best alpha in each regime,

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""QuantForge Research Director — autonomous edge-research loop (2026-06-12).
+"""QuantForge Research Director — autonomous edge-research loop .
 
 This is the closed loop the ML lane was missing. Once a week it:
 

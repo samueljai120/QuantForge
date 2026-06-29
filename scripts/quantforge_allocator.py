@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""QuantForge — Stage 4 cross-strategy capital allocator (meta-controller v1).
+"""QuantForge — Stage 4 cross-strategy capital allocator (meta-controller).
 
 Routes capital toward what wins, per regime, using the agent's own
 `regime_perf` attribution as evidence. Acts ONLY through the bounded
@@ -14,7 +14,7 @@ follows the reflect-daemon discipline:
   - every proposal logged to allocator_decisions.jsonl with full reasoning
   - training wheels: PROPOSE-ONLY until allocator_auto_apply.flag exists
 
-v1 evidence rule (per regime, vs passive HODL):
+evidence rule (per regime, vs passive HODL):
   - negative alpha  -> scale active weights (mr/futures/ml/funding) x0.80 and
     pull spot allocation 20% of the way toward the HODL baseline (0.65)
   - positive alpha  -> scale active weights x1.10 (bounded by per-key caps)
@@ -215,7 +215,7 @@ def main():
     with open(DECISIONS_FILE, "a") as f:
         f.write(json.dumps(record) + "\n")
 
-    print("QuantForge Allocator (Stage 4 v1)")
+    print("QuantForge Allocator (Stage 4)")
     if seeded:
         print("  Seeded behavior-neutral regime_weight_table from current weights.")
     if decision:

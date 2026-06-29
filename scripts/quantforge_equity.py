@@ -26,7 +26,7 @@ def compute_spot_equity(port: dict, price: float) -> float:
 def compute_true_equity(port: dict, price: float) -> float:
     """Net liquidation value for the QuantForge agent ledger.
 
-    Matches the v29 live-agent rules:
+    Matches the live-agent rules:
       - includes parked margin as account equity
       - includes direction-signed unrealized PnL
       - does not multiply leverage twice

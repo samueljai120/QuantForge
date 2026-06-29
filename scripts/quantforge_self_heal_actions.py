@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""QuantForge Self-Healing Action Bridge (v1) — Automation Layer
+"""QuantForge Self-Healing Action Bridge — Automation Layer
 
 THE GAP: The review cycle generates brilliant diagnostics (engineering actions,
 doctor reports, autopilot decisions) but NO script reads or acts on them.
@@ -666,7 +666,7 @@ def read_diagnostics() -> dict[str, dict]:
                 peak = port.get("peak_equity", port.get("starting_balance", 5000))
                 cash = port.get("cash", 0)
                 start_bal = port.get("starting_balance", 5000)
-                # True equity (v18: include futures + alts)
+                # True equity (include futures + alts)
                 alt_val = sum(a.get("qty", 0) * port.get("btc_avg_cost", 0) for a in port.get("alt_positions", {}).values())
                 fpos = port.get("futures_position", {})
                 f_margin = fpos.get("margin", 0)
@@ -1810,7 +1810,7 @@ def generate_report(flags: list[Flag], research: dict, diagnostics: dict) -> str
     research_flags = [f for f in flags if f.flag_type == "research_needed"]
     info_flags = [f for f in flags if f.flag_type == "info"]
 
-    # Accuracy (2026-06-21): an action that the safety gate WITHHELD is NOT
+    # Accuracy : an action that the safety gate WITHHELD is NOT
     # "auto-fixed". Split actually-ran fixes from gated (blocked/proposed/escalated)
     # ones so the report tells the truth about what happened.
     def _was_gated(f):

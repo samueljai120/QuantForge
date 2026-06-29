@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""QuantForge Macro Collector — free TradFi macro series (2026-06-12).
+"""QuantForge Macro Collector — free TradFi macro series .
 
 Borrows the *idea* from FinceptTerminal's free-source list (FRED/Yahoo/etc.) —
 none of its code — and pulls the TradFi macro-risk series the QuantForge

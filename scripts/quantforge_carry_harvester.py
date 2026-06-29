@@ -36,7 +36,7 @@ LOCK_PATH = "/tmp/qf_carry_harvester.lock"
 # 20bps cost (not the optimistic 6bps backtest) — each beats a 30-seed random control
 # 30/30, cost-net, on 4.5yr Binance funding (run `CARRY_COST_BPS=20 quantforge_carry_eval.py`).
 # Deliberately EXCLUDES thin/new/commodity tokens whose headline funding is unrealizable
-# at real cost. BTC + LINK were DROPPED 2026-06-22: no edge at 20bps (funding rarely goes
+# at real cost. BTC + LINK were DROPPED: no edge at 20bps (funding rarely goes
 # extreme enough to clear cost). Best edge concentrates in SOL +9.1%/yr, ZEC +4.8%,
 # 1000PEPE +3.7%, TRUMP/BNB +2.5%, WLD +2.3%; the rest are positive but thin (<1.5%/yr).
 UNIVERSE = {

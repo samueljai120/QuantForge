@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""QuantForge Moonshot Sleeve — barbell satellite lane (2026-06-12). PAPER ONLY.
+"""QuantForge Moonshot Sleeve — barbell satellite lane . PAPER ONLY.
 
 The barbell structure: the core book (quantforge_agent, $5,000) stays
 disciplined at <=5x with stops. This sleeve is the OTHER end of the barbell —

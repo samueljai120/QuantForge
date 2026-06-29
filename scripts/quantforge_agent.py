@@ -46,7 +46,7 @@ TRADES_FILE = os.path.join(DATA_DIR, "agent_trades.jsonl")
 LOG_FILE = os.path.join(DATA_DIR, "agent.log")
 REGIME_FILE = os.path.join(DATA_DIR, "agent_regime.json")
 HALT_FILE = os.path.join(DATA_DIR, "agent_halt.flag")   # if exists, all trading is frozen
-QF_PARAMS_FILE = os.path.join(DATA_DIR, "qf_strategy_params.json")  # v6: runtime tunables written by reflect daemon
+QF_PARAMS_FILE = os.path.join(DATA_DIR, "qf_strategy_params.json")  # runtime tunables written by reflect daemon
 
 KLINE_URL = "https://api-futures.kucoin.com/api/v1/kline/query"
 TICKER_URL = "https://api-futures.kucoin.com/api/v1/ticker"
@@ -59,7 +59,7 @@ STARTING_BALANCE = 5000.0
 LEVERAGE = 1                       # No leverage — pure HODL with smart sizing
 
 # Regime → target BTC allocation
-# v5 (2026-05-15): HODL-WITH-SAFETY-NETS mode.
+# HODL-WITH-SAFETY-NETS mode.
 #
 # After 5 days of live paper-trading we had clear per-regime alpha data and it was
 # unambiguous: every regime visited produced negative alpha vs passive HODL.
@@ -96,13 +96,13 @@ DRAWDOWN_TRIM_FACTOR = 0.5         # Sell half of BTC position on drawdown trip
 # rebalancer doesn't immediately buy back the BTC we just defensively sold.
 # Sells are NEVER suppressed — if the crash continues we still de-risk.
 # 48h gives the daily reflection daemon time to set a proper lower target.
-DRAWDOWN_TRIM_BUYBACK_SUPPRESS_HOURS = 6   # v12: 24h→6h — crypto moves too fast for 24h lockout
+DRAWDOWN_TRIM_BUYBACK_SUPPRESS_HOURS = 6   # 24h→6h — crypto moves too fast for 24h lockout
 PANIC_HALT_PCT = 0.15              # Full halt + liquidation if equity drops 15% from peak
-PANIC_HALT_ABS_PCT = 0.35  # v29: disabled — BTC moves 15% normally          # OR if total PnL drops below -12% of starting balance
+PANIC_HALT_ABS_PCT = 0.35  # disabled — BTC moves 15% normally          # OR if total PnL drops below -12% of starting balance
 
-# === Tail-risk caps (2026-06-22 — NON-auto-tunable hard floor) ===============
+# === Tail-risk caps (NON-auto-tunable hard floor) ===============
 # Hard ceilings the agent cannot loosen (NOT in TUNABLE_KEYS, like PANIC_HALT_PCT).
-# They harden the DISCIPLINED CORE futures lane after the v28 bleed era. The moonshot
+# They harden the DISCIPLINED CORE futures lane after the bleed era. The moonshot
 # sleeve (quantforge_moonshot.py) is a separate, downside-budgeted barbell satellite
 # and is intentionally EXEMPT — do NOT extend these caps to it.
 MAX_EFFECTIVE_LEVERAGE = 2.0       # hard ceiling on core futures leverage AFTER all scaling
@@ -110,7 +110,7 @@ DD_VELOCITY_TRIP_PCT = 0.05        # single-cycle equity drop that trips the cir
 LEVERAGE_COOLDOWN_HOURS = 6        # suppress NEW leveraged opens this long after a breaker trip
 PROFIT_TAKE_PCT = 0.10             # At +10% from start, sell 5% of position (lowered from 20%)
 PROFIT_TAKE_INCREMENT = 0.10       # Continue selling 5% every additional +10% gain
-# v12: Trailing stop for spot BTC — locks in profits on pullbacks
+# Trailing stop for spot BTC — locks in profits on pullbacks
 TRAIL_STOP_PCT = 0.05              # Sell if price drops 5% below highest since entry
 TRAIL_STOP_ACTIVATE_PCT = 0.03     # Only activate trail when up 3% from cost basis
 TAKER_FEE = 0.0006                 # KuCoin futures taker (0.06%) — charged on notional
@@ -118,12 +118,12 @@ MAKER_FEE = 0.0002                 # KuCoin futures maker (0.02%)
 SPOT_FEE  = 0.001                  # KuCoin SPOT taker (0.10%) — spot fills are NOT futures-priced;
                                    # cost-honest: no assumed KCS/VIP discount (worst-case base rate)
 
-# Performance tracking cache for auto force-trigger (v22)
+# Performance tracking cache for auto force-trigger
 # Shared across cycles via module-level dict — survives between cron invocations
 # because the Python process is long-lived (imported once per agent run cycle).
 _PERF_HISTORY_CACHE = {}  # keys: '_qf_perf_history' → list of equity values
 
-# OVER-TRADING FIX (2026-05-14):
+# OVER-TRADING FIX :
 # After 4 days of live paper cycles, the agent did 10 trades (mostly rebalancing on regime flips
 # every few hours) and lost $30 of simulated equity to fee drag. Adding three safeguards:
 #   1. Hysteresis: regime must persist for N consecutive cycles before acting
@@ -134,12 +134,12 @@ REGIME_HYSTERESIS_CYCLES = 3        # Regime must be same for 3 cycles before ac
 REBALANCE_COOLDOWN_HOURS = 6        # Min 6h between rebalances
 MAX_REBALANCES_PER_DAY = 2          # Hard cap on daily trade frequency
 
-# Mean-reversion strategy runtime tunables (v6.1 — hands-free auto-tuning)
+# Mean-reversion strategy runtime tunables (hands-free auto-tuning)
 MR_OVERSOLD_Z = -1.0                # z-score below which MR goes max-long
 MR_OVERBOUGHT_Z = 1.0               # z-score above which MR goes max-short
 MR_WEIGHT = 0.30                    # MR strategy weight
 
-# Futures lane tunables (v7 — leveraged directional trading)
+# Futures lane tunables (leveraged directional trading)
 FUTURES_WEIGHT = 0.05               # fraction of equity allocated to futures lane
 FUTURES_LEVERAGE = 3                # leverage multiplier for futures positions (auto-tunable 1-5)
 VOLATILITY_GATE_ATR = 0.035         # ATR threshold above which leverage is reduced by 1x
@@ -149,7 +149,7 @@ CONSENSUS_IRONCLAD = 8             # strategies needed for max 5x leverage
 CONSENSUS_STRONG = 5               # strategies needed for 3x leverage
 CONSENSUS_MODERATE = 3             # strategies needed for 2x leverage
 
-# ML Scanner lane tunables (v8 — multi-coin ML-driven selection)
+# ML Scanner lane tunables (multi-coin ML-driven selection)
 ML_SCANNER_WEIGHT = 0.05            # fraction of equity allocated to ML picks (spot)
 ML_SCANNER_TOP_N = 5                # max number of coins to hold
 ML_SCANNER_MIN_CONFIDENCE = 0.54    # minimum ensemble confidence for BUY signal
@@ -158,7 +158,7 @@ ML_SCANNER_VENV_PYTHON = os.path.expanduser(  # Python with xgboost/lightgbm
     "~/quantforge/.venvs/quant-ops/bin/python"
 )
 
-# ML BTC directional signal (v31) — thin-edge XGBoost predictor
+# ML BTC directional signal — thin-edge XGBoost predictor
 # Only acts when confidence > 0.55; model CV win rate 52.1% (base 50.6%)
 ML_BTC_WEIGHT = 0.05               # max ±5% of equity adjustment (0.0-0.15)
 ML_BTC_VENV_PYTHON = os.path.expanduser(  # quant-ops venv for xgboost
@@ -167,15 +167,15 @@ ML_BTC_VENV_PYTHON = os.path.expanduser(  # quant-ops venv for xgboost
 ML_BTC_PREDICTOR_SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                         "quantforge_btc_predictor.py")
 
-# TimesFM directional signal lane (v32)
+# TimesFM directional signal lane
 TIMESFM_SIGNAL_WEIGHT = 0.03        # 0 disables the lane entirely
 
-# Funding rate arbitrage lane tunables (v9)
+# Funding rate arbitrage lane tunables
 FUNDING_ARB_WEIGHT = 0.05           # fraction of equity allocated to funding arb
 FUNDING_ARB_MAX_POSITIONS = 3       # max concurrent funding arb positions
 FUNDING_ARB_POSITION_SIZE = 50.0    # USD per position (paper)
 
-# Regime-adaptive weight table (v10 — 2026-06-01)
+# Regime-adaptive weight table 
 # When REGIME_ADAPTIVE=True, strategy weights auto-swap based on the active regime.
 # This prevents the agent from fighting itself: in BEAR/STRONG_BEAR, futures short
 # gets heavier and spot HODL lighter. In BULL/STRONG_BULL, spot HODL gets heavier
@@ -195,31 +195,31 @@ REGIME_WEIGHT_TABLE = {
 # Remember last applied regime so we don't log "no change" noise every cycle
 _LAST_APPLIED_REGIME = None
 
-# Param memory: track last regime we checked for best-param recall (v22)
+# Param memory: track last regime we checked for best-param recall
 _LAST_PARAM_MEMORY_REGIME = None
 
-# Swarm consensus regime detection (v11)
+# Swarm consensus regime detection
 # When True, replaces single-model detect_regime() with 7-voter swarm consensus.
 # More robust against regime misreads — requires 4+ voters to agree.
 SWARM_REGIME = True
-SWARM_MIN_AGREEMENT = 0.50  # v12: 0.35→0.50 — fewer flips, more conviction
+SWARM_MIN_AGREEMENT = 0.50  # 0.35→0.50 — fewer flips, more conviction
 SWARM_MIN_VOTERS = 3
-SWARM_CONFIDENCE_THRESHOLD = 0.30  # v12: 0.20→0.30 — tighter consensus required
+SWARM_CONFIDENCE_THRESHOLD = 0.30  # 0.20→0.30 — tighter consensus required
 
-# Microstructure-first regime detection (v12)
+# Microstructure-first regime detection
 # When True, replaces both single-model and swarm with forward-looking order flow
 # analysis. Reads CVD, pressure imbalance, depth walls, and micro returns from
 # existing collector data — no new infrastructure. This is the fix for the
-# lagging-indicator problem documented in the v5 code comments.
+# lagging-indicator problem documented in the code comments.
 MICRO_REGIME = True
-MICRO_REGIME_MIN_CONFIDENCE = 0.20  # v12: lower threshold while data is sparse; tune up later
+MICRO_REGIME_MIN_CONFIDENCE = 0.20  # lower threshold while data is sparse; tune up later
 
 # History window for regime detection
 REGIME_LOOKBACK_HOURS = 200        # need this many 1h candles for MA200 etc
 
 
 # ---------------------------------------------------------------------------
-# Runtime tunables (v6 Stage 1) — written by quantforge_reflect.py
+# Runtime tunables (Stage 1) — written by quantforge_reflect.py
 # ---------------------------------------------------------------------------
 # At the start of every cycle, the agent reads qf_strategy_params.json (if
 # present) and overrides the module-level constants below. This is the
@@ -459,7 +459,7 @@ def load_runtime_params():
 
 
 def _apply_regime_weights(active_regime):
-    """Override strategy weights based on active regime (v10).
+    """Override strategy weights based on active regime.
 
     When REGIME_ADAPTIVE=True, reads the REGIME_WEIGHT_TABLE for the active
     regime and overrides module-level globals: TARGET_ALLOC, FUTURES_WEIGHT,
@@ -522,7 +522,7 @@ def _apply_regime_weights(active_regime):
 
     _LAST_APPLIED_REGIME = active_regime
     
-    # v28 SAFETY CLAMP: prevent strategy factory from going nuclear
+    # SAFETY CLAMP: prevent strategy factory from going nuclear
     # Net exposure = spot - futures_weight * futures_leverage
     # Must never go below -10% (max 10% net short)
     spot = TARGET_ALLOC.get(active_regime, 0.45)
@@ -653,7 +653,7 @@ _NEWS_CACHE_TTL = timedelta(minutes=30)
 
 
 def _fetch_micro_signals(closes):
-    """Compute microstructure signals from candles for auto strategies (v19).
+    """Compute microstructure signals from candles for auto strategies.
     Returns: CVD proxy, ETH/SOL proxy, liquidation proxy, OI proxy, ATR."""
     sig = {}
     n = len(closes)
@@ -849,11 +849,11 @@ def detect_regime(candles):
     sentiment = _fetch_sentiment_signals()
     signals.update(sentiment)
 
-    # Inject microstructure signals for auto-generated strategies (v19)
+    # Inject microstructure signals for auto-generated strategies
     micro_signals = _fetch_micro_signals(closes)
     signals.update(micro_signals)
 
-    # Inject news sentiment signal (v23 — zero-cost RSS, no API keys)
+    # Inject news sentiment signal (zero-cost RSS, no API keys)
     news_signal = _fetch_news_signal()
     signals["news_signal"] = news_signal
 
@@ -1014,12 +1014,12 @@ def clear_halt_marker():
 
 
 def _true_equity(port, price):
-    """v29: Net liquidation value of the agent ledger — single source of truth."""
+    """Net liquidation value of the agent ledger — single source of truth."""
     return compute_true_equity(port, price)
 
 
 def _true_drawdown(port, price):
-    """v28: Single source of truth for drawdown from peak."""
+    """Single source of truth for drawdown from peak."""
     eq = _true_equity(port, price)
     peak = port.get("peak_equity", eq)
     if peak <= 0:
@@ -1028,14 +1028,14 @@ def _true_drawdown(port, price):
 
 
 def _auto_fix_stale_peak(port, price):
-    """v29: No-op, retained for call-site compatibility.
+    """No-op, retained for call-site compatibility.
 
-    The v28 version reset peak_equity DOWNWARD whenever drawdown exceeded 10%
+    An earlier version reset peak_equity DOWNWARD whenever drawdown exceeded 10%
     while the account was profitable overall — which made the 8% drawdown trim
     and 15% panic halt unreachable from any profitable peak (a real 11% crash
     from highs would silently re-baseline instead of halting). The phantom
     drawdowns it papered over were caused by _true_equity excluding futures
-    margin; v29 includes margin, so position opens no longer dent equity and
+    margin; the current version includes margin, so position opens no longer dent equity and
     the safety breakers must measure from the genuine peak.
     """
     return False
@@ -1043,7 +1043,7 @@ def _auto_fix_stale_peak(port, price):
 
 def trip_panic_halt(port, price, reason, drawdown_pct):
     """Liquidate all BTC, close every leveraged lane, and freeze trading."""
-    # v29: single source of truth for equity (was a third inline formula that
+    # single source of truth for equity (was a third inline formula that
     # double-counted leverage and ignored SHORT direction)
     true_equity = _true_equity(port, price)
     log(f" PANIC HALT TRIPPED: {reason}")
@@ -1051,7 +1051,7 @@ def trip_panic_halt(port, price, reason, drawdown_pct):
     if port["btc_qty"] > 0:
         log(f"   Liquidating {port['btc_qty']:.6f} BTC to cash")
         sell_btc(port, price, port["btc_qty"], reason=f"panic_halt:{reason}")
-    # v29: close leveraged lanes too. A halted cycle returns before the
+    # close leveraged lanes too. A halted cycle returns before the
     # futures stop-losses run, so anything left open here is UNMANAGED
     # leveraged exposure for the entire halt duration.
     fp = port.get("futures_position") or {}
@@ -1190,17 +1190,17 @@ def init_portfolio(price, regime):
         "peak_equity": STARTING_BALANCE,
         "last_profit_take_pct": 0.0,
         "current_regime": regime,
-        # Over-trading guards (v2)
+        # Over-trading guards
         "regime_history": [regime],            # last N regimes for hysteresis
         "last_rebalance_ts": now_iso,
         "active_regime": regime,               # regime the agent is acting on (vs detected)
         "rebalance_log": [now_iso],            # timestamps of recent rebalances
-        # Per-regime performance attribution (v3, 2026-05-14)
+        # Per-regime performance attribution
         "regime_perf": {},                     # regime -> {visits, hours, our_pnl, hodl_pnl, alpha}
         "prev_cycle_equity": STARTING_BALANCE - btc_dollar_amount - fee + qty * price,
         "prev_cycle_price": price,
         "prev_cycle_ts": now_iso,
-        # Futures lane (v7)
+        # Futures lane
         "futures_position": {"direction": None, "margin": 0, "notional": 0, "entry_price": 0, "opened_at": None},
         "futures_pnl": 0.0,
         "futures_kill": False,
@@ -1276,7 +1276,7 @@ def sell_btc(port, price, qty, reason="rebalance"):
 def _rebuild_strategy_registry():
     """Rebuild STRATEGY_REGISTRY from current MR_WEIGHT and FUTURES_WEIGHT globals."""
     global STRATEGY_REGISTRY, MR_WEIGHT, FUTURES_WEIGHT, TIMESFM_SIGNAL_WEIGHT
-    LIQ_DIP_WEIGHT = 0.03  # v14: always active, must be in spot budget
+    LIQ_DIP_WEIGHT = 0.03  # always active, must be in spot budget
     ml_weight = ML_SCANNER_WEIGHT if ML_SCANNER_WEIGHT > 0 else 0.0
     hodl_weight = 1.0 - MR_WEIGHT - ml_weight - LIQ_DIP_WEIGHT - 0.09
     STRATEGY_REGISTRY = [
@@ -1298,7 +1298,7 @@ def _rebuild_strategy_registry():
 
 
 # ---------------------------------------------------------------------------
-# Strategy framework (v6 Stage 2)
+# Strategy framework (Stage 2)
 # ---------------------------------------------------------------------------
 # Goal: turn the monolithic run_cycle() into a thin orchestrator that
 # delegates "what allocation do we want?" to one or more pluggable strategies.
@@ -1464,7 +1464,7 @@ class MeanReversionStrategy(Strategy):
 
 
 class FuturesLaneStrategy(Strategy):
-    """Enhanced directional futures strategy (v8).
+    """Enhanced directional futures strategy.
 
     Trades long in BULL/STRONG_BULL, short in BEAR/STRONG_BEAR.
     Rotates to strongest/weakest coins using ML scanner confidence scores.
@@ -1509,7 +1509,7 @@ class FuturesLaneStrategy(Strategy):
 
 
 class MLScannerStrategy(Strategy):
-    """ML-driven multi-coin scanner strategy (v8).
+    """ML-driven multi-coin scanner strategy.
 
     Every cycle, scores all 200+ tracked coins using the trained XGBoost+LightGBM
     ensemble and picks the top N above confidence threshold. Allocates its slice
@@ -1536,7 +1536,7 @@ class MLScannerStrategy(Strategy):
 
 
 class LiquidationDipStrategy(Strategy):
-    """Contrarian liquidation-cascade dip buyer (v1).
+    """Contrarian liquidation-cascade dip buyer.
     ...
     """
     name = "liquidation_dip"
@@ -1549,7 +1549,7 @@ class LiquidationDipStrategy(Strategy):
 
 
 # ══════════════════════════════════════════════════════════════════════
-# Auto-generated Strategies (v19 — recursive self-improvement)
+# Auto-generated Strategies (recursive self-improvement)
 # ══════════════════════════════════════════════════════════════════════
 
 class FundingMeanReversionStrategy(Strategy):
@@ -1819,7 +1819,7 @@ def _execute_futures(port, price, futures_dir, regime, equity, signals=None, con
 
     req_dir = "LONG" if regime in ("STRONG_BULL", "BULL") else "SHORT"
 
-    # === Futures coin rotation (v20): scan for weakest/strongest coins ===
+    # === Futures coin rotation: scan for weakest/strongest coins ===
     # Uses ML scanner to find coins that outperform/underperform BTC.
     # Each aligned coin adds +1 to consensus, boosting leverage tier.
     try:
@@ -1955,7 +1955,7 @@ def _execute_futures(port, price, futures_dir, regime, equity, signals=None, con
     # === Direction FLIP / (re)establish ===
     # Close any WRONG-direction open position FIRST — credit margin + pnl back to cash
     # and write the close to the ledger — BEFORE opening the new direction.
-    # BUG FIX (2026-06-22): the close used to live in the `current_dir == req_dir` branch
+    # BUG FIX : the close used to live in the `current_dir == req_dir` branch
     # (which fires only when ALREADY correctly positioned), so a genuine LONG<->SHORT flip
     # was `LONG == SHORT` -> False -> it fell through to "Open new position" below, which
     # does `cash -= margin` and OVERWRITES futures_position — never crediting the old
@@ -2014,7 +2014,7 @@ def _execute_futures(port, price, futures_dir, regime, equity, signals=None, con
 
 
 def _execute_liquidation_dip(port, price, equity):
-    """Execute liquidation cascade contrarian dip trades (v14).
+    """Execute liquidation cascade contrarian dip trades.
 
     Reads deriv_liquidation_long_usd / deriv_liquidation_short_usd from the
     derivatives collector. When liquidations spike >2x recent average, enters
@@ -2102,7 +2102,7 @@ def _execute_liquidation_dip(port, price, equity):
     log(log_msg)
 
 
-# ── ML BTC directional predictor cache (v31) ──
+# ── ML BTC directional predictor cache ──
 _ML_BTC_CACHE = None  # dict from last subprocess call; cleared each cycle
 
 
@@ -2159,7 +2159,7 @@ def _run_ml_btc_predictor():
 
 
 def _execute_ml_positions(port, price, equity):
-    """Execute ML scanner altcoin positions (v8).
+    """Execute ML scanner altcoin positions.
 
     Calls the ML scanner subprocess to get top coin picks, then:
       - Sells altcoins no longer in the top picks
@@ -2215,7 +2215,7 @@ def _execute_ml_positions(port, price, equity):
             if conf >= ML_SCANNER_MIN_CONFIDENCE:
                 picks.append(symbol)
 
-    # ── ML picks in all regimes (v2) ──
+    # ── ML picks in all regimes ──
     # The model has a 58.4% CV WR edge — it works across regimes.
     # Stablecoins and wrapped tokens are blacklisted to avoid "safe haven" picks.
     ML_BLACKLIST = {"USDT", "USDC", "DAI", "BUSD", "TUSD", "XAUT", "PAXG", "WBTC", "BTCB",
@@ -2585,7 +2585,7 @@ def run_cycle():
     if _benchmark_hold_active():
         # HODL means hold SPOT — not freeze leverage. This cycle returns before the
         # futures stop-losses and spot breakers run, so an open futures position would
-        # sit UNMANAGED for the whole hold (the gap v29 closed for trip_panic_halt).
+        # sit UNMANAGED for the whole hold (the gap a later fix closed for trip_panic_halt).
         # "Holding" a losing leveraged short is not HODL; it is freezing a bleed. So
         # flatten any open futures with one final de-risking close (fail-safe: skipped
         # if price is unavailable), then hold spot. Spot is intentionally left untouched
@@ -2603,7 +2603,7 @@ def run_cycle():
         log("BENCHMARK HOLD: active trading trails HODL over the evidence window -> holding spot, no new positions this cycle")
         return
 
-    # === Hard halt check — auto-recovering (v15) ===
+    # === Hard halt check — auto-recovering ===
     # The halt is no longer a dead end. The agent checks whether the
     # condition that triggered it is still valid. If DD has recovered
     # below 80% of the panic threshold, auto-resume without human help.
@@ -2615,7 +2615,7 @@ def run_cycle():
             halt_info = {}
         halt_dd = halt_info.get("drawdown_pct", 1.0)
 
-        # v28: Use centralized equity + auto-fix stale peak before deciding
+        # Use centralized equity + auto-fix stale peak before deciding
         port_check = load_portfolio()
         price_check = get_btc_price()
         _auto_fix_stale_peak(port_check, price_check)
@@ -2632,7 +2632,7 @@ def run_cycle():
             log(f"   Monitoring: will auto-resume when DD drops below {auto_resume_threshold*100:.0f}%")
             return
 
-    # === Load runtime tunables from params file (v6 Stage 1) ===
+    # === Load runtime tunables from params file (Stage 1) ===
     # If qf_strategy_params.json exists, override constants for this cycle.
     # Only TUNABLE_KEYS can be set — safety constants are unreachable here.
     applied_params = load_runtime_params()
@@ -2645,7 +2645,7 @@ def run_cycle():
     candles = get_btc_klines_1h(REGIME_LOOKBACK_HOURS)
     regime, signals = detect_regime(candles)
 
-    # === Adversarial Debate (v13) — PRIMARY regime detector when active ===
+    # === Adversarial Debate — PRIMARY regime detector when active ===
     # When active (level >= 2 via auto-promotion gate), runs Bull vs Bear vs Judge
     # debate as the FIRST regime detector. Combines ALL signal sources into
     # structured arguments, weighs by historical accuracy, and produces a verdict.
@@ -2767,7 +2767,7 @@ def run_cycle():
             pass  # Debate module not installed — skip silently
 
 
-    # === Microstructure-first regime detection (v12) ===
+    # === Microstructure-first regime detection ===
     # This is the forward-looking classifier. If enabled and confident,
     # it overrides BOTH single-model and swarm. Falls back to Kronos if
     # micro confidence is too low, then to Polymarket, then to swarm.
@@ -2812,7 +2812,7 @@ def run_cycle():
         except Exception as e:
             log(f"   Micro regime unavailable: {e} — falling back to Kronos/swarm/TA")
 
-    # === Kronos foundation model regime (v12) ===
+    # === Kronos foundation model regime ===
     # Forward-looking: generates 24h price forecast from 200 candles.
     # Used when micro classifier isn't confident enough AND debate didn't override.
     if not micro_used and not debate_used:
@@ -2831,7 +2831,7 @@ def run_cycle():
         except Exception as e:
             log(f"   Kronos unavailable: {e} — falling back to swarm")
 
-    # === Polymarket prediction market signal (v12)
+    # === Polymarket prediction market signal
     # Real-money crowd sentiment — what does the market think will happen?
     # Used when both micro and Kronos aren't confident.
     if not micro_used and not debate_used:
@@ -2847,7 +2847,7 @@ def run_cycle():
         except Exception as e:
             pass  # Non-critical — skip if unavailable
 
-    # === Swarm consensus regime override (v11) ===
+    # === Swarm consensus regime override ===
     if SWARM_REGIME and not micro_used and not debate_used:
         try:
             from quantforge_swarm_regime import swarm_detect_regime, _regime_distance as _rd
@@ -2896,10 +2896,10 @@ def run_cycle():
         log(f"Equity: ${equity:,.2f}  (cash ${port['cash']:.2f}, btc ${port['btc_qty']*price:.2f})")
         return
 
-    # === v29 one-time migration ===
+    # === one-time equity migration ===
     # prev_cycle_equity, peak_equity, and regime_perf were all recorded under
-    # the pre-v29 formulas (margin excluded / leverage double-counted), so the
-    # first v29 cycle would otherwise book the entire deployed margin as a
+    # the older formulas (margin excluded / leverage double-counted), so the
+    # first migrated cycle would otherwise book the entire deployed margin as a
     # phantom regime_perf gain. Rebase to true equity and clear the corrupted
     # learning record. Self-applying so a cron tick can't race the deploy.
     if port.get("_equity_v", 0) < 29:
@@ -2911,9 +2911,9 @@ def run_cycle():
         port["peak_equity"] = max(port.get("starting_balance", STARTING_BALANCE), _true_now)
         port["_equity_v"] = 29
         save_portfolio(port)
-        log(f"   v29 migration: rebased attribution + peak to true equity ${_true_now:,.2f}; cleared corrupted regime_perf")
+        log(f"   migration: rebased attribution + peak to true equity ${_true_now:,.2f}; cleared corrupted regime_perf")
 
-    # === Per-regime performance attribution (v3) ===
+    # === Per-regime performance attribution ===
     # Compute equity & price deltas since last cycle, attribute to current
     # active_regime. This builds a learning record of WHICH regimes our
     # strategy actually adds value in (alpha = our_pnl - passive_hodl_pnl).
@@ -2921,7 +2921,7 @@ def run_cycle():
     prev_equity = port.get("prev_cycle_equity")
     prev_price = port.get("prev_cycle_price")
     prev_ts = port.get("prev_cycle_ts")
-    # v29: was `cash + btc_qty * price`, which booked every margin transfer
+    # was `cash + btc_qty * price`, which booked every margin transfer
     # (futures open, prehedge open) as a phantom loss in regime_perf — the
     # learning record the self-reflection daemon trains on. True equity is
     # margin-neutral: opening a position no longer "loses" the margin.
@@ -2973,7 +2973,7 @@ def run_cycle():
         log(f"  (detected {regime}, holding active {active_regime} — hysteresis: {recent})")
 
     # Compute current state using ACTIVE regime (smoothed), not raw detected
-    # v29: route through _true_equity — the old inline copy double-counted
+    # route through _true_equity — the old inline copy double-counted
     # leverage (notional already = margin × leverage) and treated SHORT
     # positions as LONGs (no direction sign), so in BEAR regimes equity moved
     # the wrong way. Also adds prehedge margin + PnL, which every formula missed.
@@ -2986,7 +2986,7 @@ def run_cycle():
     drawdown = (port["peak_equity"] - equity) / port["peak_equity"] if port["peak_equity"] > 0 else 0
     pnl_pct_now = (equity - STARTING_BALANCE) / STARTING_BALANCE
 
-    # === Regime-adaptive weight overrides (v10) ===
+    # === Regime-adaptive weight overrides ===
     # Auto-swap strategy weights based on active regime.
     # In STRONG_BEAR: futures short gets heavier, spot HODL lighter.
     # In STRONG_BULL: spot HODL heavier, futures long heavier.
@@ -2996,7 +2996,7 @@ def run_cycle():
         log(f"   Regime-adaptive ({active_regime}): {weight_changes}")
         _rebuild_strategy_registry()
 
-    # === Param memory: best-param recall on regime transitions (v22) ===
+    # === Param memory: best-param recall on regime transitions ===
     # After the regime switch, check if we have historical evidence that
     # different parameters performed better in this regime. If so, load them
     # (backtest-gated via qf_validate_tune.py).
@@ -3012,7 +3012,7 @@ def run_cycle():
         except Exception as e:
             log(f"   Param memory check failed: {e}")
 
-    # === Strategy registry (v6 Stage 2) ===
+    # === Strategy registry (Stage 2) ===
     # Build a read-only CycleContext and ask each strategy what allocation
     # it wants for its slice. combine_decisions reduces these into a single
     # total_target_btc_value the rebalancer drives toward.
@@ -3032,7 +3032,7 @@ def run_cycle():
     target_btc_value_global, target_alloc, futures_dir, consensus = combine_decisions(strategy_decisions, equity)
     drift = current_alloc - target_alloc
 
-    # === Learned rules from self-evolution engine (v15) ===
+    # === Learned rules from self-evolution engine ===
     # Apply rules the system learned from past bleeding events.
     # These override strategy decisions with learned corrective actions.
     try:
@@ -3049,7 +3049,7 @@ def run_cycle():
     except ImportError:
         evolve_mods = {}
 
-    # === Risk layer evaluation (v10) ===
+    # === Risk layer evaluation ===
     # Compute correlation, whale score, liquidation zones, position sizing
     try:
         from quantforge_risk import RiskContext
@@ -3065,7 +3065,7 @@ def run_cycle():
         risk = None
         log(f"   Risk layer unavailable: {e}")
 
-    # === Whale signal allocation modifier (v14) ===
+    # === Whale signal allocation modifier ===
     # Scale target allocation based on whale accumulation/distribution.
     # Accumulation (>0.3): add up to +15% allocation. Distribution (<-0.3): cut up to -15%.
     if risk is not None:
@@ -3079,7 +3079,7 @@ def run_cycle():
             if abs(target_alloc - old_target) > 0.005:
                 log(f"   Whale modifier: score={whale:+.2f} → alloc {old_target*100:.0f}% → {target_alloc*100:.0f}%")
 
-    # === ML BTC directional signal (v31) ===
+    # === ML BTC directional signal ===
     # Run the XGBoost BTC direction predictor. Only act when confidence > 0.55
     # (thin edge — CV win rate 52.1% vs base rate 50.6%).
     ml_btc_pred = _run_ml_btc_predictor()
@@ -3113,7 +3113,7 @@ def run_cycle():
 
     log(f"Equity ${equity:,.2f}  |  Cash ${port['cash']:.2f}  |  BTC ${port['btc_qty']*price:.2f} ({current_alloc*100:.1f}%)  |  target {target_alloc*100:.0f}%  |  drift {drift*100:+.1f}%  |  DD {drawdown*100:.2f}%")
 
-    # === Protective DD velocity short (v15) ===
+    # === Protective DD velocity short ===
     # Regime-agnostic circuit breaker: when DD > 8% and price is clearly
     # trending below MA20, open a small protective short immediately —
     # don't wait for the cascade to reach consensus.
@@ -3134,7 +3134,7 @@ def run_cycle():
                 }
                 log(f"   PROTECTIVE SHORT | DD {drawdown*100:.1f}% > 8%, price ${price:,.0f} < MA20 ${ma20:,.0f} — hedging {prot_margin:.0f}")
 
-    # === Accelerated BEAR sell-down (v15) ===
+    # === Accelerated BEAR sell-down ===
     # When in BEAR and price < MA20, preemptively reduce spot allocation
     # to 35% instead of waiting for regime-adaptive to do it slowly.
     if active_regime == "BEAR" and price < signals.get("MA20", price) and target_alloc > 0.35:
@@ -3151,7 +3151,7 @@ def run_cycle():
     # The absolute trigger handles the case where the bot never had a peak
     # (e.g., started losing from cycle 1) — peak-based DD would never fire.
     #
-    # v30: Auto-sync stale starting_balance. Topup events inflate the
+    # Auto-sync stale starting_balance. Topup events inflate the
     # portfolio's starting_balance (e.g. $5,000 → $7,848), causing false
     # absolute-loss panics. If inflated and we're profitable vs the code
     # constant, snap it back before computing abs_pnl_pct.
@@ -3186,7 +3186,7 @@ def run_cycle():
         if sell_btc(port, price, sell_qty, reason="drawdown_circuit_breaker"):
             port["n_drawdown_trims"] += 1
             # Reset peak so we don't keep trimming on continuing drawdown
-            # (v29: true equity — naive reset set the peak ~margin too low,
+            # (true equity — naive reset set the peak ~margin too low,
             # delaying every later breaker)
             port["peak_equity"] = _true_equity(port, price)
             # Record trim time so the rebalancer suppresses buybacks for a
@@ -3196,7 +3196,7 @@ def run_cycle():
             save_portfolio(port)
             return
 
-    # === Trailing stop for spot BTC (v12) ===
+    # === Trailing stop for spot BTC ===
     # Protects profits: if BTC rises above our cost basis and then pulls back
     # more than TRAIL_STOP_PCT from its peak, sell to lock in gains.
     # Only activates when position is in profit (price > avg cost + activation buffer).
@@ -3244,7 +3244,7 @@ def run_cycle():
         else:
             hours_since = 999
         
-        # v28: Emergency bypass for post-halt cash-lock
+        # Emergency bypass for post-halt cash-lock
         # When agent wakes with 0% BTC in a trending regime, bypass ALL gates
         current_btc_pct = port["btc_qty"] * price / max(equity, 1)
         target_btc_pct = TARGET_ALLOC.get(active_regime, 0.50)
@@ -3277,7 +3277,7 @@ def run_cycle():
         # strategy registry (computed above as target_btc_value_global).
         target_btc_value = target_btc_value_global
         
-        # v29: Confidence-gated Kelly governor — prevents nuclear bets
+        # Confidence-gated Kelly governor — prevents nuclear bets
         # Maximum tilt from baseline = half_kelly × debate_confidence
         try:
             from quantforge_gated_kelly import gated_position_size
@@ -3360,7 +3360,7 @@ def run_cycle():
             # Trim to last 50 entries (plenty for 24h window)
             port["rebalance_log"] = rebal_log[-50:]
 
-    # === Pre-hedge evaluation (v23) ===
+    # === Pre-hedge evaluation ===
     # Runs BEFORE main futures lane. Checks microstructure signals + debate
     # verdict to open a 1% equity SHORT insurance bet when the tape is turning
     # bearish but the cascade hasn't confirmed BEAR yet.
@@ -3377,16 +3377,16 @@ def run_cycle():
     except Exception as e:
         log(f"   Pre-hedge error: {e} — skipping, fall through to futures")
 
-    # === Futures lane execution (v7) ===
+    # === Futures lane execution ===
     _execute_futures(port, price, futures_dir, active_regime, equity, signals, consensus)
 
-    # === ML Scanner lane execution (v8) ===
+    # === ML Scanner lane execution ===
     _execute_ml_positions(port, price, equity)
 
-    # === Liquidation dip execution (v14) ===
+    # === Liquidation dip execution ===
     _execute_liquidation_dip(port, price, equity)
 
-    # === Funding rate arbitrage execution (v9) ===
+    # === Funding rate arbitrage execution ===
     _execute_funding_arb(port, equity, active_regime)
 
     port["current_regime"] = regime
@@ -3450,7 +3450,7 @@ def run_cycle():
     except Exception as _inv_e:
         log(f"   invariant self-check skipped: {str(_inv_e)[:120]}")
 
-    # === Self-evolution: bleeding detection + fix generation (v15) ===
+    # === Self-evolution: bleeding detection + fix generation ===
     # If this cycle triggered a bleed (rapid DD increase or PnL drop),
     # the evolution engine diagnoses the cause, generates a learned rule,
     # and applies it — all without human intervention.
@@ -3476,8 +3476,8 @@ def run_cycle():
     except ImportError:
         pass
 
-    # === Strategy Engine: strategy factory + self-patch + infra (v16 → v23) ===
-    # v23: Expanded trigger flags — degradation AND opportunity detection.
+    # === Strategy Engine: strategy factory + self-patch + infra ===
+    # Expanded trigger flags — degradation AND opportunity detection.
     # DEGRADATION triggers → force a tuner cycle + alert agent LLM analysis
     # OPPORTUNITY triggers → alert agent LLM analysis only (no auto force needed)
     try:
@@ -3653,7 +3653,7 @@ def run_cycle():
             except Exception:
                 pass
 
-        # Capital efficiency check (v26) — flag idle cash
+        # Capital efficiency check — flag idle cash
         try:
             from quantforge_capital_efficiency import check as _cap_check
             cap_result = _cap_check()
@@ -3663,7 +3663,7 @@ def run_cycle():
         except Exception:
             pass
 
-        # ── Kelly Criterion check (v27) ────────────────────────────
+        # ── Kelly Criterion check ────────────────────────────
         # On regime transition or high drift, compute optimal position size
         try:
             regime_transitioned = bool(prev_regime and prev_regime != regime)
@@ -3680,7 +3680,7 @@ def run_cycle():
         except Exception:
             pass
 
-        # ── Execution quality audit (v27) ──────────────────────────
+        # ── Execution quality audit ──────────────────────────
         # On degradation, check if slippage is eating profits
         try:
             if force_agi or losing_streak >= 2:
@@ -3693,7 +3693,7 @@ def run_cycle():
         except Exception:
             pass
 
-        # ── Capital efficiency check (v26) — flag idle cash
+        # ── Capital efficiency check — flag idle cash
 
         # Adaptive cooldown: compress during crisis, relax during calm
         _cd = 3.0  # default
@@ -3704,7 +3704,7 @@ def run_cycle():
         elif signals.get("atr_pct", 0.02) > 0.05:
             _cd = 1.0   # elevated
 
-        # ── Strategy auto-retirement check (v24) ──────────────────
+        # ── Strategy auto-retirement check ──────────────────
         # When DD > 10% or losing streak >= 3, audit strategies for
         # underperformers and auto-retire if criteria met.
         retire_names = []
@@ -3736,7 +3736,7 @@ def run_cycle():
     except ImportError:
         pass
 
-    # === Self-healing check (v12) ===
+    # === Self-healing check ===
     # Runs at end of every cycle. Detects degradation and auto-recovers.
     try:
         from quantforge_self_heal import check_health, apply_recovery, _save_health
@@ -3787,7 +3787,7 @@ def run_cycle():
     except Exception as e:
         pass  # Self-healing is non-critical — agent continues without it
 
-    # === Debate gate evaluation (v13) ===
+    # === Debate gate evaluation ===
     # Check if debate should be promoted or demoted based on system health.
     # Runs at end of every cycle after self-healing has diagnosed the system.
     try:
@@ -3861,7 +3861,7 @@ def cmd_status():
         print("No agent portfolio yet. Run 'run' to initialize.")
         return
     price = get_btc_price()
-    # v29: status uses the same single-source equity as the trading loop —
+    # status uses the same single-source equity as the trading loop —
     # the old copy excluded futures + prehedge margin, so dashboards showed
     # a fake drawdown the size of whatever margin happened to be deployed.
     equity = _true_equity(port, price)
@@ -3926,7 +3926,7 @@ def cmd_status():
     print(f"  Drawdown trims:    {port['n_drawdown_trims']}")
     print(f"  Profit takes:      {port['n_profit_takes']}")
     print(f"  Total fees:        ${port['total_fees_paid']:.2f}")
-    # Futures lane status (v7)
+    # Futures lane status
     fp = port.get("futures_position") or {}
     if fp.get("direction"):
         fpnl_unrealized = 0.0
@@ -3941,7 +3941,7 @@ def cmd_status():
         print(f"  Futures unreal PnL:${fpnl_unrealized:+,.2f}")
     if port.get("futures_pnl", 0) != 0:
         print(f"  Futures realized:  ${port['futures_pnl']:+,.2f}")
-    # ML Scanner lane status (v8)
+    # ML Scanner lane status
     alt_positions = port.get("alt_positions", {})
     if alt_positions:
         alt_total = sum(p.get("qty", 0) * price for p in alt_positions.values())
@@ -4038,7 +4038,7 @@ def cmd_panic_reset():
     if port:
         port["panic_halted"] = False
         port["last_panic_reset_at"] = datetime.now(timezone.utc).isoformat()
-        # v29: actually reset the peak (the old line computed a placeholder and
+        # actually reset the peak (the old line computed a placeholder and
         # never stored it, so a stale pre-halt peak could re-trip the breakers
         # on the very next cycle)
         try:
@@ -4140,7 +4140,7 @@ def cmd_strategies():
     """Inspect the strategy registry: list active strategies, their weights,
     and what each one is currently saying given live market state.
 
-    This is the v6 Stage 2 introspection tool — useful both for humans
+    This is the Stage 2 introspection tool — useful both for humans
     auditing the system and for the reflect daemon to see what each strategy
     contributes when (Stage 3+) multiple strategies coexist.
     """

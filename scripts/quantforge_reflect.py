@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-QuantForge Self-Reflection Daemon (v6 Stage 1)
+QuantForge Self-Reflection Daemon (Stage 1)
 ================================================
 
 Runs once per day (piggybacked on quantforge_daily_summary cron at 07:15 UTC).
@@ -76,14 +76,14 @@ ANTHROPIC_MODEL = "claude-sonnet-4-5-20250929"
 MAX_TOKENS = 1500
 
 TRAINING_WHEELS_RUNS = 7   # propose-only for first 7 runs (unless flag touched)
-MAX_DELTA_FRACTION = 0.15  # v12: 10%→15% — gave false rejections on borderline moves
+MAX_DELTA_FRACTION = 0.15  # 10%→15% — gave false rejections on borderline moves
 # Floating-point epsilon for the delta-cap comparison. Without this, a "10%
 # exactly" proposal (e.g., 0.65 → 0.585) computes as 0.10000000000000002 in
 # IEEE-754 and was getting rejected. The daemon clearly intends "max allowed"
-# when it picks the boundary — honor that intent. 2026-05-24 fix.
+# when it picks the boundary — honor that intent.
 DELTA_CAP_EPSILON = 1e-9
 
-# Asymmetric re-risk path (2026-05-29). For fixed_alloc_pct ONLY, the daemon
+# Asymmetric re-risk path . For fixed_alloc_pct ONLY, the daemon
 # may raise allocation faster than it cuts — but ONLY when the regime has
 # exited bear. Rationale: after de-risking through a crash, we want to catch a
 # genuine recovery quickly, but we must NOT add aggressively into a confirmed
@@ -858,7 +858,7 @@ def main() -> int:
         return 0
 
     try:
-        # ── Backtesting gate (v2) ──
+        # ── Backtesting gate ──
         # Before applying, replay last 7 days to validate.
         import subprocess
         gate_script = os.path.join(os.path.dirname(os.path.abspath(__file__)),

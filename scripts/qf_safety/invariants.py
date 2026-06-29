@@ -1,6 +1,6 @@
 """Money-conservation invariants — the self-DETECTION layer.
 
-A system can only self-heal what it can DETECT. The margin-orphan bug (2026-06-22)
+A system can only self-heal what it can DETECT. The margin-orphan bug 
 destroyed ~$400 every regime flip SILENTLY: no crash, no error, and the ledger even
 showed +$18 "realized" — because nothing ever asked *"does the money conserve?"*. These
 pure checks answer that question and FLAG any unexplained loss / orphaned margin / ledger
@@ -52,7 +52,7 @@ def equity(port: dict, price: float) -> float:
 def check_futures_parity(trades: list, *, position_open: bool) -> List[Violation]:
     """Every FUTURES_OPEN must have a matching FUTURES_CLOSE unless a position is open now:
     n_open == n_close + (1 if open else 0). A surplus = position(s) opened but never closed
-    => orphaned margin. This is the exact 2026-06-22 bug signature (4 opens / 0 closes / flat)."""
+    => orphaned margin. This is the exact orphaned-margin bug signature (4 opens / 0 closes / flat)."""
     n_open = sum(1 for t in trades if t.get("type") == "FUTURES_OPEN")
     n_close = sum(1 for t in trades if t.get("type") == "FUTURES_CLOSE")
     net = n_open - n_close
@@ -155,7 +155,7 @@ def check_alt_positions_sane(port: dict) -> List[Violation]:
 
 
 def check_starting_balance_integrity(port: dict, *, base: float = 5000.0) -> List[Violation]:
-    """The baseline used for PnL% must not silently inflate (the v30 topup bug hid losses by
+    """The baseline used for PnL% must not silently inflate (the topup bug hid losses by
     raising starting_balance from $5k to ~$7.8k). Flag gross inflation and non-positive."""
     _raw = port.get("starting_balance", base)
     sb = float(_raw) if _raw is not None else base   # don't coerce 0.0 -> base (it must flag nonpositive)
@@ -165,7 +165,7 @@ def check_starting_balance_integrity(port: dict, *, base: float = 5000.0) -> Lis
     if sb > base * 1.5:
         return [Violation("starting_balance_inflated", "warning",
                           f"starting_balance ${sb:.0f} >> baseline ${base:.0f} — inflated baseline hides losses",
-                          "a topup raised starting_balance (v30 class); PnL% understates the real loss")]
+                          "a topup raised starting_balance (topup class); PnL% understates the real loss")]
     return []
 
 

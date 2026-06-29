@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""QuantForge ML Deep Rebuild — research-only trainer (2026-06-12).
+"""QuantForge ML Deep Rebuild — research-only trainer .
 
 Rebuild scope per governance research_hold candidate: labels, targets,
 features, evaluation. The old pipeline (quantforge_ml_train.py) produced
