@@ -407,7 +407,7 @@ def main():
 
     # Gate check: CV win rate must be > base rate
     if metrics["cv_win_rate"] <= metrics["base_rate"]:
-        print("\n  ⛔ GATE FAILED: CV win rate not better than random")
+        print("\n   GATE FAILED: CV win rate not better than random")
         meta = {
             "gate_pass": False,
             "trained_at": datetime.now(timezone.utc).isoformat(),

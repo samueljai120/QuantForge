@@ -245,7 +245,7 @@ def check_promotion(ledger):
             }
             with open(PROMOTION_PATH, "w") as f:
                 json.dump(candidate, f, indent=2)
-            log(f"🏁 PROMOTION CANDIDATE: {arm} passed gates twice consecutively "
+            log(f" PROMOTION CANDIDATE: {arm} passed gates twice consecutively "
                 f"-> {PROMOTION_PATH}")
             return candidate
     return None

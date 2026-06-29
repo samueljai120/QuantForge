@@ -217,7 +217,7 @@ def _obsidian_daily_summary():
     regime = port.get("active_regime", port.get("current_regime", "?"))
     fpos = port.get("futures_position", {}) or {}
     fdir = fpos.get("direction", "NONE")
-    halted = "🚨 HALTED" if port.get("panic_halted") else "✅ Active"
+    halted = " HALTED" if port.get("panic_halted") else " Active"
     
     content = f"""# {today}
 
@@ -320,7 +320,7 @@ def _obsidian_record_tech_radar(findings: list[dict]):
             url = item.get("url", "")
             desc = item.get("description", "")[:200]
             stars = item.get("stars", "")
-            star_str = f" ⭐{stars}" if stars else ""
+            star_str = f" {stars}" if stars else ""
             lines.append(f"- [{title}]({url}){star_str} — {desc}")
         lines.append("")
     
@@ -630,7 +630,7 @@ def _tech_radar_summary() -> str:
     if not rows:
         return "No new technology findings this week."
     
-    lines = ["## 🌐 Tech Radar — New This Week", ""]
+    lines = ["##  Tech Radar — New This Week", ""]
     sources = {}
     for r in rows:
         sources.setdefault(r[0], []).append(r)
@@ -1030,7 +1030,7 @@ def _fix_agent_halt() -> str:
         port["panic_halt_ts"] = 0
         with open(portfolio_path, "w") as f:
             json.dump(port, f, indent=2)
-        return f"✅ AUTO-RESUMED: {reason}"
+        return f" AUTO-RESUMED: {reason}"
     else:
         return (f"NOT auto-resuming: DD start={dd_start:.1%}, DD peak={dd_peak:.1%}, "
                 f"halted {hours_halted:.0f}h, reason={halt_reason[:50]}")
@@ -1225,7 +1225,7 @@ def _fix_research_data() -> str:
     findings = research_github_trending()
     if findings:
         top = findings[0]
-        return f"Research: top repo {top['name']} ({top['stars']}★) — {top['desc'][:80]}"
+        return f"Research: top repo {top['name']} ({top['stars']}) — {top['desc'][:80]}"
     return "Research: no new findings"
 
 
@@ -1820,11 +1820,11 @@ def generate_report(flags: list[Flag], research: dict, diagnostics: dict) -> str
     gated_flags = [f for f in auto_flags if _was_gated(f)]
     pending_flags = [f for f in auto_flags if not f.executed]
 
-    lines.append(f"## ⚡ AUTO-FIXED ({len(ran_flags)})")
+    lines.append(f"##  AUTO-FIXED ({len(ran_flags)})")
     lines.append("")
     if ran_flags:
         for f in ran_flags:
-            lines.append(f"✅ **{f.description}**")
+            lines.append(f" **{f.description}**")
             lines.append(f"   → Action: `{f.auto_action}`")
             lines.append(f"   → Result: {f.execution_result}")
             lines.append(f"   → Predicted: {f.predicted_outcome}")
@@ -1835,7 +1835,7 @@ def generate_report(flags: list[Flag], research: dict, diagnostics: dict) -> str
 
     # ── Withheld by the safety layer (NOT auto-applied) ──
     if gated_flags:
-        lines.append(f"## 🔒 GATED — withheld by safety, NOT auto-applied ({len(gated_flags)})")
+        lines.append(f"##  GATED — withheld by safety, NOT auto-applied ({len(gated_flags)})")
         lines.append("")
         lines.append("These were blocked from autonomous execution by the safety gates. "
                      "They are NOT fixed. They are NOT pending your approval — the system "
@@ -1844,7 +1844,7 @@ def generate_report(flags: list[Flag], research: dict, diagnostics: dict) -> str
                      "explicitly submitted for deploy.")
         lines.append("")
         for f in gated_flags:
-            lines.append(f"🔒 **{f.description}** — {f.execution_result}")
+            lines.append(f" **{f.description}** — {f.execution_result}")
             lines.append("")
 
     if pending_flags:
@@ -1855,7 +1855,7 @@ def generate_report(flags: list[Flag], research: dict, diagnostics: dict) -> str
         lines.append("")
 
     if manual_flags:
-        lines.append(f"## 🧭 MANUAL REVIEW ({len(manual_flags)})")
+        lines.append(f"##  MANUAL REVIEW ({len(manual_flags)})")
         lines.append("")
         for f in manual_flags:
             lines.append(f"• **{f.description}**")
@@ -1877,10 +1877,10 @@ def generate_report(flags: list[Flag], research: dict, diagnostics: dict) -> str
 
     # ── Research findings ──
     if research.get("github"):
-        lines.append("## 🌐 Market Research")
+        lines.append("##  Market Research")
         lines.append("")
         for r in research["github"]:
-            lines.append(f"• **{r['name']}** ⭐{r['stars']} — {r['desc'][:100]}")
+            lines.append(f"• **{r['name']}** {r['stars']} — {r['desc'][:100]}")
             lines.append(f"  {r['url']}")
         lines.append("")
 
@@ -1891,7 +1891,7 @@ def generate_report(flags: list[Flag], research: dict, diagnostics: dict) -> str
 
     # ── Stale / info ──
     if info_flags:
-        lines.append("## ℹ️ Info")
+        lines.append("## ℹ Info")
         lines.append("")
         for f in info_flags[:5]:
             lines.append(f"• {f.description}")

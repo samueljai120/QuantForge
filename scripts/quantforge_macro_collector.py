@@ -179,7 +179,7 @@ def main():
     log(f"macro collect ({cmd}, range={rng})...")
     fresh = collect(rng)
     if fresh.empty:
-        log("⚠️ no data fetched — keeping existing parquet")
+        log(" no data fetched — keeping existing parquet")
         sys.exit(1)
     if cmd == "update":
         old = load()

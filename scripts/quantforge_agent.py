@@ -293,7 +293,7 @@ def load_runtime_params():
         with open(QF_PARAMS_FILE) as f:
             params = json.load(f)
     except Exception as e:
-        log(f"  ⚠️ Could not load {QF_PARAMS_FILE}: {e} — using defaults")
+        log(f"   Could not load {QF_PARAMS_FILE}: {e} — using defaults")
         return {}
     applied = {}
     for raw_key, value in params.items():
@@ -301,7 +301,7 @@ def load_runtime_params():
             continue
         key = PARAM_KEY_ALIASES.get(raw_key, raw_key)
         if key not in TUNABLE_KEYS:
-            log(f"  ⚠️ Ignoring non-tunable param '{raw_key}' in params file")
+            log(f"   Ignoring non-tunable param '{raw_key}' in params file")
             continue
         if key == "hodl_mode":
             HODL_MODE = bool(value)
@@ -312,7 +312,7 @@ def load_runtime_params():
                 TARGET_ALLOC = {r: v for r in TARGET_ALLOC}
                 applied[key] = v
             else:
-                log(f"  ⚠️ fixed_alloc_pct {v} out of bounds [0.40, 0.85] — ignored")
+                log(f"   fixed_alloc_pct {v} out of bounds [0.40, 0.85] — ignored")
         elif key == "rebalance_threshold":
             v = float(value)
             if 0.02 <= v <= 0.20:
@@ -432,7 +432,7 @@ def load_runtime_params():
                 REGIME_WEIGHT_TABLE = v
                 applied[key] = f"<{len(v)} regimes>"
             else:
-                log(f"  ⚠️ regime_weight_table missing required regimes — ignored")
+                log(f"   regime_weight_table missing required regimes — ignored")
         elif key == "swarm_regime":
             SWARM_REGIME = bool(value)
             applied[key] = SWARM_REGIME
@@ -445,14 +445,14 @@ def load_runtime_params():
                 ML_BTC_WEIGHT = v
                 applied[key] = v
             else:
-                log(f"  ⚠️ ml_btc_weight {v} out of bounds [0.0, 0.15] — ignored")
+                log(f"   ml_btc_weight {v} out of bounds [0.0, 0.15] — ignored")
         elif key == "timesfm_signal_weight":
             v = float(value)
             if 0.0 <= v <= 0.10:
                 TIMESFM_SIGNAL_WEIGHT = v
                 applied[key] = v
             else:
-                log(f"  ⚠️ timesfm_signal_weight {v} out of bounds [0.0, 0.10] — ignored")
+                log(f"   timesfm_signal_weight {v} out of bounds [0.0, 0.10] — ignored")
     # Rebuild strategy registry with current MR_WEIGHT
     _rebuild_strategy_registry()
     return applied
@@ -498,7 +498,7 @@ def _apply_regime_weights(active_regime):
         lo, hi = _TABLE_BOUNDS["spot_alloc_pct"]
         clamped = min(max(float(spot_pct), lo), hi)
         if clamped != float(spot_pct):
-            log(f"  ⚠️ regime table spot_alloc_pct {spot_pct} out of bounds [{lo}, {hi}] — clamped to {clamped}")
+            log(f"   regime table spot_alloc_pct {spot_pct} out of bounds [{lo}, {hi}] — clamped to {clamped}")
         old = TARGET_ALLOC.get(active_regime, TARGET_ALLOC.get("NEUTRAL", 0.55))
         TARGET_ALLOC[active_regime] = clamped
         changes["spot_alloc"] = f"{old:.0%}→{clamped:.0%}"
@@ -516,7 +516,7 @@ def _apply_regime_weights(active_regime):
                 lo, hi = _TABLE_BOUNDS[key]
                 clamped = min(max(float(val), lo), hi)
                 if clamped != float(val):
-                    log(f"  ⚠️ regime table {key} {val} out of bounds [{lo}, {hi}] — clamped to {clamped}")
+                    log(f"   regime table {key} {val} out of bounds [{lo}, {hi}] — clamped to {clamped}")
                 globals()[var_name] = clamped
                 changes[key] = f"{old_val:.0%}→{clamped:.0%}"
 
@@ -535,10 +535,10 @@ def _apply_regime_weights(active_regime):
         max_fw = (spot + 0.10) / max(fle, 1)
         clamped_fw = min(max_fw, 0.15)
         globals()["FUTURES_WEIGHT"] = clamped_fw
-        log(f"  🛡️ SAFETY CLAMP: net exposure {net_exposure:.0%} below -10% → futures {fw:.0%}→{clamped_fw:.0%}")
+        log(f"   SAFETY CLAMP: net exposure {net_exposure:.0%} below -10% → futures {fw:.0%}→{clamped_fw:.0%}")
     if active_regime in ("BEAR", "STRONG_BEAR") and spot < 0.35:
         TARGET_ALLOC[active_regime] = 0.35
-        log(f"  🛡️ SAFETY CLAMP: STRONG_BEAR/BEAR spot floor 35% → {spot:.0%}→35%")
+        log(f"   SAFETY CLAMP: STRONG_BEAR/BEAR spot floor 35% → {spot:.0%}→35%")
     
     return changes
 
@@ -722,7 +722,7 @@ def _fetch_sentiment_signals():
             fng = json.loads(resp.read().decode())
         data["fear_greed"] = int(fng["data"][0]["value"])
     except Exception as e:
-        log(f"  ⚠️ Fear & Greed fetch failed: {e}")
+        log(f"   Fear & Greed fetch failed: {e}")
 
     try:
         # KuCoin funding rate (already using this API for price)
@@ -731,7 +731,7 @@ def _fetch_sentiment_signals():
             contract = json.loads(resp.read().decode())
         data["funding_rate"] = float(contract["data"]["fundingFeeRate"])
     except Exception as e:
-        log(f"  ⚠️ Funding rate fetch failed: {e}")
+        log(f"   Funding rate fetch failed: {e}")
 
     _SENTIMENT_CACHE = {"ts": now, "data": data}
     return data
@@ -752,7 +752,7 @@ def _fetch_news_signal():
         from quantforge_news import get_news_signal
         data = get_news_signal()
     except Exception as e:
-        log(f"  ⚠️ News signal fetch failed: {e}")
+        log(f"   News signal fetch failed: {e}")
 
     _NEWS_CACHE = {"ts": now, "data": data}
     return data
@@ -789,7 +789,7 @@ def _apply_sentiment_modifier(target_alloc_pct, signals):
     # Clamp to safe range
     adjusted = max(0.25, min(0.80, adjusted))
     if adj != 0:
-        log(f"  📊 Sentiment: {tag} (F&G={fg}) → alloc {target_alloc_pct*100:.0f}% → {adjusted*100:.0f}%")
+        log(f"   Sentiment: {tag} (F&G={fg}) → alloc {target_alloc_pct*100:.0f}% → {adjusted*100:.0f}%")
     return adjusted
 
 
@@ -1046,7 +1046,7 @@ def trip_panic_halt(port, price, reason, drawdown_pct):
     # v29: single source of truth for equity (was a third inline formula that
     # double-counted leverage and ignored SHORT direction)
     true_equity = _true_equity(port, price)
-    log(f"🚨🚨🚨 PANIC HALT TRIPPED: {reason}")
+    log(f" PANIC HALT TRIPPED: {reason}")
     log(f"   True equity: ${true_equity:,.2f}  Peak: ${port.get('peak_equity', STARTING_BALANCE):,.2f}  DD: {drawdown_pct*100:.2f}%")
     if port["btc_qty"] > 0:
         log(f"   Liquidating {port['btc_qty']:.6f} BTC to cash")
@@ -1083,7 +1083,7 @@ def trip_panic_halt(port, price, reason, drawdown_pct):
             res = _ph_close(port, price)
             log(f"   Closing prehedge | PnL ${res.get('pnl', 0):+.2f}")
         except Exception as e:
-            log(f"   ⚠️ Prehedge close failed during halt: {e}")
+            log(f"    Prehedge close failed during halt: {e}")
     lp = port.get("liq_dip_position") or {}
     if lp.get("direction") and lp.get("notional", 0) > 0:
         entry = lp.get("entry_price", price)
@@ -1137,7 +1137,7 @@ def check_dd_velocity_breaker(port, price):
         drop = (prev - eq) / prev
         if drop < DD_VELOCITY_TRIP_PCT:
             return False
-        log(f"🧯 DD-VELOCITY BREAKER: equity ${prev:,.2f} → ${eq:,.2f} "
+        log(f" DD-VELOCITY BREAKER: equity ${prev:,.2f} → ${eq:,.2f} "
             f"({drop*100:.1f}% in one cycle ≥ {DD_VELOCITY_TRIP_PCT*100:.0f}%) — "
             f"flattening leverage, keeping spot BTC.")
         # Futures lane — tested helper: no-op when flat, fail-safe on bad price, ledgers the close.
@@ -1149,7 +1149,7 @@ def check_dd_velocity_breaker(port, price):
                 res = _ph_close(port, price)
                 log(f"   Closing prehedge | PnL ${res.get('pnl', 0):+.2f}")
             except Exception as e:
-                log(f"   ⚠️ Prehedge close failed in breaker: {e}")
+                log(f"    Prehedge close failed in breaker: {e}")
         # Liquidation-dip lane
         lp = port.get("liq_dip_position") or {}
         if lp.get("direction") and lp.get("notional", 0) > 0:
@@ -1166,7 +1166,7 @@ def check_dd_velocity_breaker(port, price):
         port["dd_velocity_trips"] = port.get("dd_velocity_trips", 0) + 1
         return True
     except Exception as e:
-        log(f"⚠️ dd-velocity breaker error (ignored, no trip): {e}")
+        log(f" dd-velocity breaker error (ignored, no trip): {e}")
         return False
 
 
@@ -1745,7 +1745,7 @@ def _close_futures_position(port, price, reason, *, trade_sink=None, now=None):
         "usd": fp["margin"] + pnl, "fee": 0.0, "pnl_usd": round(pnl, 2),
         "direction": fp["direction"],
     })
-    log(f"  🛡️ Futures FLATTEN-CLOSE {fp['direction']} PnL ${pnl:+.2f} (reason={reason})")
+    log(f"   Futures FLATTEN-CLOSE {fp['direction']} PnL ${pnl:+.2f} (reason={reason})")
     port["futures_position"] = {"direction": None, "margin": 0, "notional": 0, "entry_price": 0, "opened_at": None}
     return True
 
@@ -1778,7 +1778,7 @@ def _execute_futures(port, price, futures_dir, regime, equity, signals=None, con
         return  # permanently disabled until manual reset
     total_futures_pnl = port.get("futures_pnl", 0.0)
     if total_futures_pnl <= -port.get("starting_balance", STARTING_BALANCE) * 0.05:
-        log(f"  💀 Futures KILL SWITCH — cumulative PnL ${total_futures_pnl:+.2f} <= -$250 (-5%). Futures disabled permanently. Run panic-reset to clear.")
+        log(f"   Futures KILL SWITCH — cumulative PnL ${total_futures_pnl:+.2f} <= -$250 (-5%). Futures disabled permanently. Run panic-reset to clear.")
         port["futures_kill"] = True
         _close_futures_position(port, price, "kill_switch")
         return
@@ -1801,7 +1801,7 @@ def _execute_futures(port, price, futures_dir, regime, equity, signals=None, con
                 pnl = fp["notional"] * (1.0 - price / entry)
             port["cash"] += fp["margin"] + pnl
             port["futures_pnl"] = port.get("futures_pnl", 0.0) + pnl
-            log(f"  🔄 Futures CLOSE {current_dir} (regime {regime} — no trend) PnL ${pnl:+.2f} | total ${port['futures_pnl']:+.2f}")
+            log(f"   Futures CLOSE {current_dir} (regime {regime} — no trend) PnL ${pnl:+.2f} | total ${port['futures_pnl']:+.2f}")
             append_trade({
                 "ts": datetime.now(timezone.utc).isoformat(),
                 "side": "close_" + current_dir.lower(),
@@ -1832,15 +1832,15 @@ def _execute_futures(port, price, futures_dir, regime, equity, signals=None, con
                 if regime in ("BEAR", "STRONG_BEAR"):
                     # Short the weakest (highest confidence = most likely to underperform in bear)
                     rotation = coins[:3]
-                    log(f"  🎯 Futures rotation SHORT: {rotation}")
+                    log(f"   Futures rotation SHORT: {rotation}")
                     consensus += len(rotation)
                 elif regime in ("BULL", "STRONG_BULL"):
                     # Long the strongest (highest confidence = most likely to outperform in bull)
                     rotation = coins[:3]
-                    log(f"  🎯 Futures rotation LONG: {rotation}")
+                    log(f"   Futures rotation LONG: {rotation}")
                     consensus += len(rotation)
     except Exception as e:
-        log(f"  ⚠️ Futures rotation scan: {e}")
+        log(f"   Futures rotation scan: {e}")
 
     # === Conviction-scaled leverage: consensus → tier → multiplier ===
     # More strategies agreeing on direction = higher conviction = more leverage
@@ -1860,7 +1860,7 @@ def _execute_futures(port, price, futures_dir, regime, equity, signals=None, con
         atr_pct_val = signals.get("atr_pct", 0.01)
         if atr_pct_val > VOLATILITY_GATE_ATR:
             active_leverage = max(1.0, active_leverage - 1.0)
-            log(f"  🌊 Volatility gate: ATR {atr_pct_val*100:.1f}% > {VOLATILITY_GATE_ATR*100:.1f}% → leverage reduced to {active_leverage:.0f}x")
+            log(f"   Volatility gate: ATR {atr_pct_val*100:.1f}% > {VOLATILITY_GATE_ATR*100:.1f}% → leverage reduced to {active_leverage:.0f}x")
     elif active_leverage == 0:
         return  # no futures in neutral/chop
 
@@ -1869,7 +1869,7 @@ def _execute_futures(port, price, futures_dir, regime, equity, signals=None, con
     # ironclad tier nor an auto-raised FUTURES_LEVERAGE can over-lever the core lane.
     # (The moonshot sleeve is a SEPARATE, downside-budgeted module — not capped here.)
     if active_leverage > MAX_EFFECTIVE_LEVERAGE:
-        log(f"  🧯 Leverage cap: {active_leverage:.0f}x → {MAX_EFFECTIVE_LEVERAGE:.0f}x (hard ceiling)")
+        log(f"   Leverage cap: {active_leverage:.0f}x → {MAX_EFFECTIVE_LEVERAGE:.0f}x (hard ceiling)")
         active_leverage = MAX_EFFECTIVE_LEVERAGE
 
     # === ATR trailing stop check (only if we have signals) ===
@@ -1883,7 +1883,7 @@ def _execute_futures(port, price, futures_dir, regime, equity, signals=None, con
                 pnl = fp["notional"] * (price / entry - 1.0)
                 port["cash"] += fp["margin"] + pnl
                 port["futures_pnl"] = port.get("futures_pnl", 0.0) + pnl
-                log(f"  🛑 Futures STOP-LOSS LONG | ATR stop {stop_loss_pct*100:.2f}% | actual DD {drawdown_pct*100:.2f}% | PnL ${pnl:+.2f}")
+                log(f"   Futures STOP-LOSS LONG | ATR stop {stop_loss_pct*100:.2f}% | actual DD {drawdown_pct*100:.2f}% | PnL ${pnl:+.2f}")
                 append_trade({
                     "ts": datetime.now(timezone.utc).isoformat(),
                     "side": "close_long",
@@ -1904,7 +1904,7 @@ def _execute_futures(port, price, futures_dir, regime, equity, signals=None, con
                 pnl = fp["notional"] * (1.0 - price / entry)
                 port["cash"] += fp["margin"] + pnl
                 port["futures_pnl"] = port.get("futures_pnl", 0.0) + pnl
-                log(f"  🛑 Futures STOP-LOSS SHORT | ATR stop {stop_loss_pct*100:.2f}% | actual rally {rally_pct*100:.2f}% | PnL ${pnl:+.2f}")
+                log(f"   Futures STOP-LOSS SHORT | ATR stop {stop_loss_pct*100:.2f}% | actual rally {rally_pct*100:.2f}% | PnL ${pnl:+.2f}")
                 append_trade({
                     "ts": datetime.now(timezone.utc).isoformat(),
                     "side": "close_short",
@@ -1932,7 +1932,7 @@ def _execute_futures(port, price, futures_dir, regime, equity, signals=None, con
         if unrealized <= -max_loss:
             port["cash"] += fp["margin"] + unrealized
             port["futures_pnl"] = port.get("futures_pnl", 0.0) + unrealized
-            log(f"  🛑 Futures MAX-LOSS STOP {current_dir} | loss ${unrealized:+.2f} exceeds ${max_loss:.2f} (30% of margin) | total futures PnL ${port['futures_pnl']:+.2f}")
+            log(f"   Futures MAX-LOSS STOP {current_dir} | loss ${unrealized:+.2f} exceeds ${max_loss:.2f} (30% of margin) | total futures PnL ${port['futures_pnl']:+.2f}")
             append_trade({
                 "ts": datetime.now(timezone.utc).isoformat(),
                 "side": "close_" + current_dir.lower(),
@@ -1972,7 +1972,7 @@ def _execute_futures(port, price, futures_dir, regime, equity, signals=None, con
     # close above still runs (de-risk, don't re-lever) — mirrors the DD-trim buyback
     # suppression: never suppress closes, only opens.
     if _in_leverage_cooldown(port):
-        log("  ⏸️ Futures open suppressed — dd-velocity leverage cooldown active")
+        log("  ⏸ Futures open suppressed — dd-velocity leverage cooldown active")
         return
 
     # === Open new position ===
@@ -1985,7 +1985,7 @@ def _execute_futures(port, price, futures_dir, regime, equity, signals=None, con
     # converge. The futures lane used to record fee=0.0 (traded for free in its own books).
     fee = notional * TAKER_FEE * 2
     if margin + fee > port["cash"]:
-        log(f"  ⚠️ Futures skipped — insufficient cash (need ${margin + fee:.2f}, have ${port['cash']:.2f})")
+        log(f"   Futures skipped — insufficient cash (need ${margin + fee:.2f}, have ${port['cash']:.2f})")
         return
     port["cash"] -= margin + fee
     port["total_fees_paid"] = port.get("total_fees_paid", 0.0) + fee
@@ -1997,7 +1997,7 @@ def _execute_futures(port, price, futures_dir, regime, equity, signals=None, con
         "leverage": active_leverage,
         "opened_at": datetime.now(timezone.utc).isoformat(),
     }
-    log(f"  🚀 Futures OPEN {req_dir} | margin ${margin:.2f} | notional ${notional:.2f} ({active_leverage}x) @ ${price:,.2f} | rt-fee ${fee:.2f}")
+    log(f"   Futures OPEN {req_dir} | margin ${margin:.2f} | notional ${notional:.2f} ({active_leverage}x) @ ${price:,.2f} | rt-fee ${fee:.2f}")
     append_trade({
         "ts": datetime.now(timezone.utc).isoformat(),
         "side": "open_" + req_dir.lower(),
@@ -2056,13 +2056,13 @@ def _execute_liquidation_dip(port, price, equity):
             # Exit: +3% profit or -5% loss or 24h max hold
             if pnl > LP["notional"] * 0.03 or pnl < -LP["notional"] * 0.05 or held_hours > 24:
                 port["cash"] += LP["margin"] + pnl
-                log(f"  🔄 LIQ_DIP CLOSE LONG | held {held_hours:.1f}h | PnL ${pnl:+.2f}")
+                log(f"   LIQ_DIP CLOSE LONG | held {held_hours:.1f}h | PnL ${pnl:+.2f}")
                 port["liq_dip_position"] = {}
         else:  # SHORT
             pnl = LP["notional"] * (1.0 - price / entry)
             if pnl > LP["notional"] * 0.03 or pnl < -LP["notional"] * 0.05 or held_hours > 24:
                 port["cash"] += LP["margin"] + pnl
-                log(f"  🔄 LIQ_DIP CLOSE SHORT | held {held_hours:.1f}h | PnL ${pnl:+.2f}")
+                log(f"   LIQ_DIP CLOSE SHORT | held {held_hours:.1f}h | PnL ${pnl:+.2f}")
                 port["liq_dip_position"] = {}
         return  # Position still open, wait
 
@@ -2086,10 +2086,10 @@ def _execute_liquidation_dip(port, price, equity):
 
     if long_spike:
         direction = "LONG"
-        log_msg = f"  🩸 LIQ_DIP LONG | long liq ${liq_long:,.0f} vs avg ${avg_liq_long:,.0f} ({liq_long/avg_liq_long:.1f}x) — buying the dip"
+        log_msg = f"   LIQ_DIP LONG | long liq ${liq_long:,.0f} vs avg ${avg_liq_long:,.0f} ({liq_long/avg_liq_long:.1f}x) — buying the dip"
     else:
         direction = "SHORT"
-        log_msg = f"  🩸 LIQ_DIP SHORT | short liq ${liq_short:,.0f} vs avg ${avg_liq_short:,.0f} ({liq_short/avg_liq_short:.1f}x) — fading the pump"
+        log_msg = f"   LIQ_DIP SHORT | short liq ${liq_short:,.0f} vs avg ${avg_liq_short:,.0f} ({liq_short/avg_liq_short:.1f}x) — fading the pump"
 
     port["cash"] -= margin
     port["liq_dip_position"] = {
@@ -2134,23 +2134,23 @@ def _run_ml_btc_predictor():
             env={**_os.environ, "PYTHONWARNINGS": "ignore"},
         )
         if result.returncode != 0:
-            log(f"  ⚠️ ML BTC predictor subprocess failed (rc={result.returncode}): {result.stderr[:200]}")
+            log(f"   ML BTC predictor subprocess failed (rc={result.returncode}): {result.stderr[:200]}")
             _ML_BTC_CACHE = None
             return None
     except Exception as e:
-        log(f"  ⚠️ ML BTC predictor error: {e}")
+        log(f"   ML BTC predictor error: {e}")
         _ML_BTC_CACHE = None
         return None
 
     try:
         pred = json.loads(result.stdout)
     except json.JSONDecodeError as e:
-        log(f"  ⚠️ ML BTC predictor bad JSON: {e}")
+        log(f"   ML BTC predictor bad JSON: {e}")
         _ML_BTC_CACHE = None
         return None
 
     if "error" in pred:
-        log(f"  ⚠️ ML BTC predictor error: {pred['error']}")
+        log(f"   ML BTC predictor error: {pred['error']}")
         _ML_BTC_CACHE = None
         return None
 
@@ -2192,10 +2192,10 @@ def _execute_ml_positions(port, price, equity):
             env={**os.environ, "PYTHONWARNINGS": "ignore"},
         )
         if result.returncode != 0:
-            log(f"  ⚠️ ML scanner subprocess failed: {result.stderr[:200]}")
+            log(f"   ML scanner subprocess failed: {result.stderr[:200]}")
             return
     except Exception as e:
-        log(f"  ⚠️ ML scanner error: {e}")
+        log(f"   ML scanner error: {e}")
         return
 
     # Parse scanner output (format: "1. SYMBOL conf=0.XXXX ...")
@@ -2230,7 +2230,7 @@ def _execute_ml_positions(port, price, equity):
             if pos.get("qty", 0) > 0:
                 sale_value = pos["qty"] * price * 0.995
                 port["cash"] = port.get("cash", 0) + sale_value
-                log(f"  🔄 ML SELL {sym}: {pos['qty']:.6f} @ ~${price:,.2f} = ${sale_value:.2f}")
+                log(f"   ML SELL {sym}: {pos['qty']:.6f} @ ~${price:,.2f} = ${sale_value:.2f}")
                 append_trade({
                     "ts": datetime.now(timezone.utc).isoformat(), "side": "sell", "type": "ALT_SELL",
                     "reason": "ml_liquidate", "strategy_id": "ml_scanner", "symbol": sym,
@@ -2240,7 +2240,7 @@ def _execute_ml_positions(port, price, equity):
                 })
             del alt_positions[sym]
         port["alt_positions"] = alt_positions
-        log(f"  🤖 ML Scanner: no picks above {ML_SCANNER_MIN_CONFIDENCE} confidence — liquidated all")
+        log(f"   ML Scanner: no picks above {ML_SCANNER_MIN_CONFIDENCE} confidence — liquidated all")
         return
 
     # Cap to top_n
@@ -2253,7 +2253,7 @@ def _execute_ml_positions(port, price, equity):
         risk_adjusted_max = equity * _risk.max_position_pct
         if risk_adjusted_max < per_coin_budget:
             per_coin_budget = risk_adjusted_max
-            log(f"  🛡️ Risk-adjusted position: ${per_coin_budget:.2f} (corr={_risk.correlation_penalty:.2f})")
+            log(f"   Risk-adjusted position: ${per_coin_budget:.2f} (corr={_risk.correlation_penalty:.2f})")
     except Exception:
         pass
 
@@ -2267,7 +2267,7 @@ def _execute_ml_positions(port, price, equity):
         if pos.get("qty", 0) > 0:
             sale_value = pos["qty"] * price * 0.995
             port["cash"] = port.get("cash", 0) + sale_value
-            log(f"  🔄 ML ROTATE OUT {sym}: sold {pos['qty']:.6f} @ ~${price:,.2f} = ${sale_value:.2f}")
+            log(f"   ML ROTATE OUT {sym}: sold {pos['qty']:.6f} @ ~${price:,.2f} = ${sale_value:.2f}")
             append_trade({
                 "ts": datetime.now(timezone.utc).isoformat(), "side": "sell", "type": "ALT_SELL",
                 "reason": "ml_rotate_out", "strategy_id": "ml_scanner", "symbol": sym,
@@ -2289,15 +2289,15 @@ def _execute_ml_positions(port, price, equity):
                     "avg_cost": price,
                     "added_at": datetime.now(timezone.utc).isoformat(),
                 }
-                log(f"  🚀 ML BUY {sym}: {qty:.6f} @ ${price:,.2f} = ${cost:.2f}")
+                log(f"   ML BUY {sym}: {qty:.6f} @ ${price:,.2f} = ${cost:.2f}")
             else:
-                log(f"  ⚠️ ML SKIP {sym}: insufficient cash (need ${cost:.2f}, have ${port.get('cash', 0):.2f})")
+                log(f"   ML SKIP {sym}: insufficient cash (need ${cost:.2f}, have ${port.get('cash', 0):.2f})")
 
     port["alt_positions"] = alt_positions
     total_alt_value = sum(
         p.get("qty", 0) * price for p in alt_positions.values()
     )
-    log(f"  🤖 ML Scanner: {len(alt_positions)} positions, ${total_alt_value:.2f} value, "
+    log(f"   ML Scanner: {len(alt_positions)} positions, ${total_alt_value:.2f} value, "
         f"picks: {', '.join(picks)}")
 
 
@@ -2341,7 +2341,7 @@ def _execute_funding_arb(port, equity, active_regime):
             env={**os.environ, "PYTHONWARNINGS": "ignore"},
         )
         if result.returncode != 0:
-            log(f"  ⚠️ Funding arb v2 error: {result.stderr[:300]}")
+            log(f"   Funding arb v2 error: {result.stderr[:300]}")
         else:
             output = result.stdout.strip()
             if output:
@@ -2371,7 +2371,7 @@ def _execute_funding_arb(port, equity, active_regime):
                         pnl_pct = trade.get("pnl_pct", 0)
                         exit_reason = trade.get("exit_reason", "unknown")
                         hours_held = trade.get("hours_held", 0)
-                        log(f"  💸 FundingArb EXIT {symbol}: {exit_reason} | "
+                        log(f"   FundingArb EXIT {symbol}: {exit_reason} | "
                             f"PnL ${pnl_usd:+.2f} ({pnl_pct*100:+.2f}%) | "
                             f"Held {hours_held:.1f}h")
 
@@ -2383,25 +2383,25 @@ def _execute_funding_arb(port, equity, active_regime):
                         funding_annual = pos.get("funding_annual_pct", 0)
 
                         if total_deployed_v2 + size_usd > equity * FUNDING_ARB_MAX_EQUITY_PCT:
-                            log(f"  🛡️ FundingArb cap: cannot enter {symbol} "
+                            log(f"   FundingArb cap: cannot enter {symbol} "
                                 f"(${size_usd:.0f}) — would exceed 15% equity cap")
                             continue
                         total_deployed_v2 += size_usd
-                        log(f"  💹 FundingArb ENTER {symbol}: "
+                        log(f"   FundingArb ENTER {symbol}: "
                             f"funding={entry_funding*100:.3f}% ({funding_annual:.1f}% ann) | "
                             f"@${entry_price:,.2f} | size=${size_usd:.0f}")
 
     except FileNotFoundError:
-        log(f"  ⚠️ Funding arb v2 script not found at {arb_script}")
+        log(f"   Funding arb v2 script not found at {arb_script}")
     except subprocess.TimeoutExpired:
-        log(f"  ⚠️ Funding arb v2 timed out after 180s")
+        log(f"   Funding arb v2 timed out after 180s")
     except Exception as e:
-        log(f"  ⚠️ Funding arb v2 failed: {e}")
+        log(f"   Funding arb v2 failed: {e}")
 
     # ── Strategy 2: Conviction-scaled levered funding arb ────────
     # Only call levered strategy when funding arb weight > 0 (gate above)
     if not os.path.exists(levered_script):
-        log(f"  ⚠️ Levered funding arb script not found at {levered_script}")
+        log(f"   Levered funding arb script not found at {levered_script}")
     else:
         try:
             result = subprocess.run(
@@ -2410,7 +2410,7 @@ def _execute_funding_arb(port, equity, active_regime):
                 env={**os.environ, "PYTHONWARNINGS": "ignore"},
             )
             if result.returncode != 0:
-                log(f"  ⚠️ Levered funding arb error: {result.stderr[:300]}")
+                log(f"   Levered funding arb error: {result.stderr[:300]}")
             else:
                 output = result.stdout.strip()
                 if output:
@@ -2440,7 +2440,7 @@ def _execute_funding_arb(port, equity, active_regime):
                             exit_reason = trade.get("exit_reason", "unknown")
                             hours_held = trade.get("hours_held", 0)
                             partial = " [PARTIAL]" if trade.get("partial") else ""
-                            log(f"  ⚡ LeveredArb EXIT{partial} {symbol}: {exit_reason} | "
+                            log(f"   LeveredArb EXIT{partial} {symbol}: {exit_reason} | "
                                 f"PnL ${pnl_usd:+.2f} ({pnl_pct*100:+.2f}%) | "
                                 f"Held {hours_held:.1f}h")
 
@@ -2457,21 +2457,21 @@ def _execute_funding_arb(port, equity, active_regime):
                             # Combined cap: v2 + levered ≤ 20% of equity
                             combined = total_deployed_v2 + total_deployed_levered + size_usd
                             if combined > equity * 0.20:
-                                log(f"  🛡️ LeveredArb cap: cannot enter {symbol} "
+                                log(f"   LeveredArb cap: cannot enter {symbol} "
                                     f"(${size_usd:.0f}) — combined would exceed 20% equity "
                                     f"(${total_deployed_v2 + total_deployed_levered:.0f} deployed)")
                                 continue
 
                             total_deployed_levered += size_usd
-                            log(f"  ⚡ LeveredArb ENTER {symbol}: "
+                            log(f"   LeveredArb ENTER {symbol}: "
                                 f"z={z_score:.2f} lever={lever:.1f}x | "
                                 f"funding={entry_funding*100:.3f}% ({funding_annual:.1f}% ann) | "
                                 f"@${entry_price:,.4f} | size=${size_usd:.0f}")
 
         except subprocess.TimeoutExpired:
-            log(f"  ⚠️ Levered funding arb timed out after 180s")
+            log(f"   Levered funding arb timed out after 180s")
         except Exception as e:
-            log(f"  ⚠️ Levered funding arb failed: {e}")
+            log(f"   Levered funding arb failed: {e}")
 
     # ── Sync positions from both strategy state files ────────────
     if "funding_arb_positions" not in port:
@@ -2504,7 +2504,7 @@ def _execute_funding_arb(port, equity, active_regime):
             port["funding_arb_positions"] = new_v2
             total_deployed_v2 = tdv2
         except Exception as e:
-            log(f"  ⚠️ Funding arb state read: {e}")
+            log(f"   Funding arb state read: {e}")
 
     # Read levered state
     levered_state_path = os.path.join(DATA_DIR, "funding_arb_levered_state.json")
@@ -2534,7 +2534,7 @@ def _execute_funding_arb(port, equity, active_regime):
             port["funding_arb_levered_positions"] = new_lev
             total_deployed_levered = tdl
         except Exception as e:
-            log(f"  ⚠️ Levered arb state read: {e}")
+            log(f"   Levered arb state read: {e}")
 
     # ── Combined summary ─────────────────────────────────────────
     total_deployed = total_deployed_v2 + total_deployed_levered
@@ -2561,7 +2561,7 @@ def _execute_funding_arb(port, equity, active_regime):
         except Exception:
             pass
 
-    log(f"  📊 FundingArb: ${total_deployed:.0f} deployed "
+    log(f"   FundingArb: ${total_deployed:.0f} deployed "
         f"({pct_deployed:.1f}% of ${equity:,.0f} equity, "
         f"cap ${max_allowed:.0f}) | "
         f"v2: {v2_open} open | levered: {levered_open} open | "
@@ -2626,9 +2626,9 @@ def run_cycle():
 
         if current_dd < auto_resume_threshold:
             clear_halt_marker()
-            log(f"🧬 auto-recovery: DD now {current_dd*100:.1f}% < {auto_resume_threshold*100:.1f}% threshold (halt was {halt_dd*100:.1f}% at {halt_info.get('halted_at', '?')[:19]}) — resuming autonomously")
+            log(f" auto-recovery: DD now {current_dd*100:.1f}% < {auto_resume_threshold*100:.1f}% threshold (halt was {halt_dd*100:.1f}% at {halt_info.get('halted_at', '?')[:19]}) — resuming autonomously")
         else:
-            log(f"⛔ HALTED — DD {current_dd*100:.1f}% still above {auto_resume_threshold*100:.1f}% auto-resume threshold (halted at {halt_info.get('halted_at', '?')[:19]})")
+            log(f" HALTED — DD {current_dd*100:.1f}% still above {auto_resume_threshold*100:.1f}% auto-resume threshold (halted at {halt_info.get('halted_at', '?')[:19]})")
             log(f"   Monitoring: will auto-resume when DD drops below {auto_resume_threshold*100:.0f}%")
             return
 
@@ -2637,7 +2637,7 @@ def run_cycle():
     # Only TUNABLE_KEYS can be set — safety constants are unreachable here.
     applied_params = load_runtime_params()
     if applied_params:
-        log(f"  ⚙️ Runtime params loaded: {applied_params}")
+        log(f"   Runtime params loaded: {applied_params}")
 
     price = get_btc_price()
     log(f"BTC price: ${price:,.2f}")
@@ -2750,19 +2750,19 @@ def run_cycle():
                     if debate_level >= DEBATE_MIN_LEVEL_FOR_ACTION and verdict.confidence >= 0.25:
                         regime = debate_regime
                         debate_used = True
-                        log(f"  ⚖️  Debate verdict: {verdict.regime} (conf={verdict.confidence:.3f}, {verdict.resolution})")
-                        log(f"  ⚖️  Bull {verdict.bull_strength:.3f} vs Bear {verdict.bear_strength:.3f} — {verdict.winning_theme}")
+                        log(f"    Debate verdict: {verdict.regime} (conf={verdict.confidence:.3f}, {verdict.resolution})")
+                        log(f"    Bull {verdict.bull_strength:.3f} vs Bear {verdict.bear_strength:.3f} — {verdict.winning_theme}")
                         if verdict.contrarian_flag:
-                            log(f"  ⚖️  ⚠️ Contrarian flag: unanimous agreement — reduced confidence")
+                            log(f"     Contrarian flag: unanimous agreement — reduced confidence")
                         if verdict.confidence < 0.35:
-                            log(f"  ⚖️  Low debate confidence ({verdict.confidence:.3f}) — will fall through to micro if available")
+                            log(f"    Low debate confidence ({verdict.confidence:.3f}) — will fall through to micro if available")
                             debate_used = False  # Allow micro to override if debate isn't confident
                     elif debate_level >= 1:
                         # Shadow mode — log the verdict without acting on it
-                        log(f"  ⚖️  [SHADOW] Debate verdict: {verdict.regime} (conf={verdict.confidence:.3f})")
-                        log(f"  ⚖️  [SHADOW] Bull {verdict.bull_strength:.3f} vs Bear {verdict.bear_strength:.3f} — {verdict.winning_theme}")
+                        log(f"    [SHADOW] Debate verdict: {verdict.regime} (conf={verdict.confidence:.3f})")
+                        log(f"    [SHADOW] Bull {verdict.bull_strength:.3f} vs Bear {verdict.bear_strength:.3f} — {verdict.winning_theme}")
                 except Exception as e:
-                    log(f"  ⚠️ Debate unavailable: {e} — falling through cascade")
+                    log(f"   Debate unavailable: {e} — falling through cascade")
         except ImportError:
             pass  # Debate module not installed — skip silently
 
@@ -2780,10 +2780,10 @@ def run_cycle():
             if micro_confidence >= MICRO_REGIME_MIN_CONFIDENCE:
                 regime = micro_regime
                 micro_used = True
-                log(f"  🔬 Micro regime: {regime} (conf={micro_confidence:.3f}, score={micro_signals.regime_score:+.2f})")
-                log(f"  🔬 CVD 4h: {micro_signals.cvd_4h:+,.0f}  pressure: {micro_signals.pressure_imbalance:+.2f}  depth: {micro_signals.depth_imbalance:+.3f}")
+                log(f"   Micro regime: {regime} (conf={micro_confidence:.3f}, score={micro_signals.regime_score:+.2f})")
+                log(f"   CVD 4h: {micro_signals.cvd_4h:+,.0f}  pressure: {micro_signals.pressure_imbalance:+.2f}  depth: {micro_signals.depth_imbalance:+.3f}")
                 if micro_signals.pressure_extreme:
-                    log(f"  🔬 Pressure extreme ({micro_signals.pressure_extreme_direction:+d}) — potential reversal zone")
+                    log(f"   Pressure extreme ({micro_signals.pressure_extreme_direction:+d}) — potential reversal zone")
                 # Log prediction for self-tuning
                 try:
                     from quantforge_self_tune import log_prediction
@@ -2808,9 +2808,9 @@ def run_cycle():
                 except Exception:
                     pass  # Non-critical — self-tuning will catch up later
             else:
-                log(f"  🔬 Micro regime confidence too low ({micro_confidence:.3f} < {MICRO_REGIME_MIN_CONFIDENCE}) — falling back to Kronos/swarm/TA")
+                log(f"   Micro regime confidence too low ({micro_confidence:.3f} < {MICRO_REGIME_MIN_CONFIDENCE}) — falling back to Kronos/swarm/TA")
         except Exception as e:
-            log(f"  ⚠️ Micro regime unavailable: {e} — falling back to Kronos/swarm/TA")
+            log(f"   Micro regime unavailable: {e} — falling back to Kronos/swarm/TA")
 
     # === Kronos foundation model regime (v12) ===
     # Forward-looking: generates 24h price forecast from 200 candles.
@@ -2823,13 +2823,13 @@ def run_cycle():
                 if kronos_conf > 0.3:  # Kronos has meaningful conviction
                     regime = kronos_regime
                     micro_used = True
-                    log(f"  🧠 Kronos regime: {regime} (conf={kronos_conf:.3f}, forecast {kronos_pct:+.2f}% 24h)")
+                    log(f"   Kronos regime: {regime} (conf={kronos_conf:.3f}, forecast {kronos_pct:+.2f}% 24h)")
                 else:
-                    log(f"  🧠 Kronos forecast {kronos_pct:+.2f}% — too flat, falling back to swarm")
+                    log(f"   Kronos forecast {kronos_pct:+.2f}% — too flat, falling back to swarm")
             else:
-                log(f"  🧠 Kronos not available — falling back to swarm")
+                log(f"   Kronos not available — falling back to swarm")
         except Exception as e:
-            log(f"  ⚠️ Kronos unavailable: {e} — falling back to swarm")
+            log(f"   Kronos unavailable: {e} — falling back to swarm")
 
     # === Polymarket prediction market signal (v12)
     # Real-money crowd sentiment — what does the market think will happen?
@@ -2841,9 +2841,9 @@ def run_cycle():
             if pm_conf > 0.3 and pm_regime != "NEUTRAL":
                 regime = pm_regime
                 micro_used = True
-                log(f"  💰 Polymarket regime: {regime} (conf={pm_conf:.3f})")
+                log(f"   Polymarket regime: {regime} (conf={pm_conf:.3f})")
             elif pm_conf > 0.0:
-                log(f"  💰 Polymarket: {pm_regime} (conf={pm_conf:.3f}) — low conviction, falling back")
+                log(f"   Polymarket: {pm_regime} (conf={pm_conf:.3f}) — low conviction, falling back")
         except Exception as e:
             pass  # Non-critical — skip if unavailable
 
@@ -2911,7 +2911,7 @@ def run_cycle():
         port["peak_equity"] = max(port.get("starting_balance", STARTING_BALANCE), _true_now)
         port["_equity_v"] = 29
         save_portfolio(port)
-        log(f"  🔧 v29 migration: rebased attribution + peak to true equity ${_true_now:,.2f}; cleared corrupted regime_perf")
+        log(f"   v29 migration: rebased attribution + peak to true equity ${_true_now:,.2f}; cleared corrupted regime_perf")
 
     # === Per-regime performance attribution (v3) ===
     # Compute equity & price deltas since last cycle, attribute to current
@@ -2966,7 +2966,7 @@ def run_cycle():
     recent = history[-REGIME_HYSTERESIS_CYCLES:]
     if len(recent) >= REGIME_HYSTERESIS_CYCLES and len(set(recent)) == 1:
         if recent[0] != active_regime:
-            log(f"📊 Active regime change: {active_regime} → {recent[0]} (confirmed {REGIME_HYSTERESIS_CYCLES}× consecutive)")
+            log(f" Active regime change: {active_regime} → {recent[0]} (confirmed {REGIME_HYSTERESIS_CYCLES}× consecutive)")
             active_regime = recent[0]
             port["active_regime"] = active_regime
     else:
@@ -2993,7 +2993,7 @@ def run_cycle():
     # In CHOP: MR dominates. BEAR: funding arb ramps up.
     weight_changes = _apply_regime_weights(active_regime)
     if weight_changes:
-        log(f"  🔄 Regime-adaptive ({active_regime}): {weight_changes}")
+        log(f"   Regime-adaptive ({active_regime}): {weight_changes}")
         _rebuild_strategy_registry()
 
     # === Param memory: best-param recall on regime transitions (v22) ===
@@ -3006,11 +3006,11 @@ def run_cycle():
         try:
             from quantforge_param_memory import apply_best_if_known
             if apply_best_if_known(active_regime):
-                log(f"  🧠 Param memory: loaded best historical params for {active_regime}")
+                log(f"   Param memory: loaded best historical params for {active_regime}")
         except ImportError:
             pass  # param memory module not available — not a hard failure
         except Exception as e:
-            log(f"  ⚠️ Param memory check failed: {e}")
+            log(f"   Param memory check failed: {e}")
 
     # === Strategy registry (v6 Stage 2) ===
     # Build a read-only CycleContext and ask each strategy what allocation
@@ -3045,7 +3045,7 @@ def run_cycle():
             old = target_alloc
             target_alloc = evolve_mods["alloc_cap"]
             target_btc_value_global = target_alloc * equity
-            log(f"  🧬 Evolved rule: alloc cap {evolve_mods['alloc_cap']*100:.0f}% (from {old*100:.0f}%)")
+            log(f"   Evolved rule: alloc cap {evolve_mods['alloc_cap']*100:.0f}% (from {old*100:.0f}%)")
     except ImportError:
         evolve_mods = {}
 
@@ -3057,13 +3057,13 @@ def run_cycle():
         risk = RiskContext().evaluate(
             picks=ml_picks, equity=equity, regime=active_regime, btc_price=price
         )
-        log(f"  🛡️ Risk: whale={risk.whale_score:+.1f} corr_penalty={risk.correlation_penalty:.2f} "
+        log(f"   Risk: whale={risk.whale_score:+.1f} corr_penalty={risk.correlation_penalty:.2f} "
             f"max_pos={risk.max_position_pct*100:.2f}% regime_mult={risk.regime_risk_mult:.1f}x")
         for w in risk.warnings[:3]:  # Top 3 warnings
-            log(f"  ⚠️  {w}")
+            log(f"    {w}")
     except Exception as e:
         risk = None
-        log(f"  ⚠️ Risk layer unavailable: {e}")
+        log(f"   Risk layer unavailable: {e}")
 
     # === Whale signal allocation modifier (v14) ===
     # Scale target allocation based on whale accumulation/distribution.
@@ -3077,7 +3077,7 @@ def run_cycle():
             target_alloc = max(0.25, target_alloc)  # Never below 25%
             target_btc_value_global = target_alloc * equity
             if abs(target_alloc - old_target) > 0.005:
-                log(f"  🐋 Whale modifier: score={whale:+.2f} → alloc {old_target*100:.0f}% → {target_alloc*100:.0f}%")
+                log(f"   Whale modifier: score={whale:+.2f} → alloc {old_target*100:.0f}% → {target_alloc*100:.0f}%")
 
     # === ML BTC directional signal (v31) ===
     # Run the XGBoost BTC direction predictor. Only act when confidence > 0.55
@@ -3102,9 +3102,9 @@ def run_cycle():
                 target_alloc = target_btc_value_global / equity
                 target_alloc = max(0.25, target_alloc)
                 FUTURES_WEIGHT = min(0.30, FUTURES_WEIGHT + 0.03)
-            log(f"  🤖 ML BTC: {ml_dir} (conf={ml_conf:.0%}, prob_up={ml_prob_up:.0%}) → adjust ${adjustment:+,.0f}")
+            log(f"   ML BTC: {ml_dir} (conf={ml_conf:.0%}, prob_up={ml_prob_up:.0%}) → adjust ${adjustment:+,.0f}")
             if ml_dir == "down" and abs(FUTURES_WEIGHT - old_fw) > 0.001:
-                log(f"  🤖 ML BTC short conviction: futures weight {old_fw:.0%} → {FUTURES_WEIGHT:.0%}")
+                log(f"   ML BTC short conviction: futures weight {old_fw:.0%} → {FUTURES_WEIGHT:.0%}")
 
     # Log strategy roster (one line for Stage 2's single strategy; will fan
     # out cleanly when Stage 3 adds more)
@@ -3132,7 +3132,7 @@ def run_cycle():
                     "opened_at": datetime.now(timezone.utc).isoformat(),
                     "protective": True,  # marked as protection, not directional bet
                 }
-                log(f"  🛡️ PROTECTIVE SHORT | DD {drawdown*100:.1f}% > 8%, price ${price:,.0f} < MA20 ${ma20:,.0f} — hedging {prot_margin:.0f}")
+                log(f"   PROTECTIVE SHORT | DD {drawdown*100:.1f}% > 8%, price ${price:,.0f} < MA20 ${ma20:,.0f} — hedging {prot_margin:.0f}")
 
     # === Accelerated BEAR sell-down (v15) ===
     # When in BEAR and price < MA20, preemptively reduce spot allocation
@@ -3142,7 +3142,7 @@ def run_cycle():
         target_alloc = max(0.35, target_alloc * 0.85)  # aggressive cut
         target_btc_value_global = target_alloc * equity
         if abs(target_alloc - old_target) > 0.01:
-            log(f"  ⚡ BEAR sell-down: price ${price:,.0f} < MA20 ${signals.get('MA20', price):,.0f} → alloc {old_target*100:.0f}% → {target_alloc*100:.0f}%")
+            log(f"   BEAR sell-down: price ${price:,.0f} < MA20 ${signals.get('MA20', price):,.0f} → alloc {old_target*100:.0f}% → {target_alloc*100:.0f}%")
 
     # === Panic halt circuit breaker (checked BEFORE soft trim) ===
     # Two independent triggers — whichever fires first wins:
@@ -3160,7 +3160,7 @@ def run_cycle():
         _pnl_vs_code = (equity - STARTING_BALANCE) / STARTING_BALANCE
         if _pnl_vs_code > -0.05:
             port["starting_balance"] = STARTING_BALANCE
-            log(f"  🔧 Auto-synced starting_balance ${_sb:,.0f}→${STARTING_BALANCE:,.0f} (P&L vs code {_pnl_vs_code:+.1%})")
+            log(f"   Auto-synced starting_balance ${_sb:,.0f}→${STARTING_BALANCE:,.0f} (P&L vs code {_pnl_vs_code:+.1%})")
     abs_pnl_pct = (equity - port.get("starting_balance", STARTING_BALANCE)) / port.get("starting_balance", STARTING_BALANCE)
     halt_reason = None
     if drawdown >= PANIC_HALT_PCT:
@@ -3181,7 +3181,7 @@ def run_cycle():
 
     # === Drawdown circuit breaker (soft, -8%: trims half) ===
     if drawdown >= DRAWDOWN_TRIM_PCT and port["btc_qty"] > 0:
-        log(f"⚠️ Drawdown {drawdown*100:.2f}% >= {DRAWDOWN_TRIM_PCT*100:.0f}%. Trimming {DRAWDOWN_TRIM_FACTOR*100:.0f}% of BTC.")
+        log(f" Drawdown {drawdown*100:.2f}% >= {DRAWDOWN_TRIM_PCT*100:.0f}%. Trimming {DRAWDOWN_TRIM_FACTOR*100:.0f}% of BTC.")
         sell_qty = port["btc_qty"] * DRAWDOWN_TRIM_FACTOR
         if sell_btc(port, price, sell_qty, reason="drawdown_circuit_breaker"):
             port["n_drawdown_trims"] += 1
@@ -3210,7 +3210,7 @@ def run_cycle():
             # Trail is active — check if we've pulled back from peak
             pullback = (highest_since_entry - price) / highest_since_entry
             if pullback >= TRAIL_STOP_PCT:
-                log(f"🎯 TRAIL STOP: -{pullback*100:.1f}% from peak ${highest_since_entry:,.0f} → closing position")
+                log(f" TRAIL STOP: -{pullback*100:.1f}% from peak ${highest_since_entry:,.0f} → closing position")
                 if sell_btc(port, price, port["btc_qty"], reason="trailing_stop"):
                     port.pop("highest_price_since_entry", None)  # Reset trail after exit
                     port["n_trail_stops"] = port.get("n_trail_stops", 0) + 1
@@ -3223,7 +3223,7 @@ def run_cycle():
     if pnl_pct >= max(PROFIT_TAKE_PCT, next_take_threshold):
         sell_pct_of_btc = 0.05
         sell_qty = port["btc_qty"] * sell_pct_of_btc
-        log(f"🎯 Profit milestone {pnl_pct*100:+.1f}% — taking {sell_pct_of_btc*100:.0f}% off the table")
+        log(f" Profit milestone {pnl_pct*100:+.1f}% — taking {sell_pct_of_btc*100:.0f}% off the table")
         if sell_btc(port, price, sell_qty, reason="profit_take"):
             port["n_profit_takes"] += 1
             port["last_profit_take_pct"] = pnl_pct
@@ -3254,12 +3254,12 @@ def run_cycle():
             and abs(current_btc_pct - target_btc_pct) > 0.30
         )
         if post_halt_emergency:
-            log(f"  🚨 EMERGENCY BYPASS: {current_btc_pct:.0%} BTC in {active_regime} "
+            log(f"   EMERGENCY BYPASS: {current_btc_pct:.0%} BTC in {active_regime} "
                 f"(target {target_btc_pct:.0%}) — skipping cooldown+cap")
             # Fall through — don't return, proceed directly to rebalance
         
         elif hours_since < REBALANCE_COOLDOWN_HOURS:
-            log(f"  ⏸️ Rebalance blocked — only {hours_since:.1f}h since last (min {REBALANCE_COOLDOWN_HOURS}h)")
+            log(f"  ⏸ Rebalance blocked — only {hours_since:.1f}h since last (min {REBALANCE_COOLDOWN_HOURS}h)")
             port["current_regime"] = active_regime
             save_portfolio(port)
             return
@@ -3269,7 +3269,7 @@ def run_cycle():
             cutoff = (now_dt - timedelta(hours=24)).isoformat()
             recent_rebal = [r for r in rebal_log if r > cutoff]
             if len(recent_rebal) >= MAX_REBALANCES_PER_DAY:
-                log(f"  ⛔ Rebalance blocked — {len(recent_rebal)} rebalances in last 24h (cap {MAX_REBALANCES_PER_DAY})")
+                log(f"   Rebalance blocked — {len(recent_rebal)} rebalances in last 24h (cap {MAX_REBALANCES_PER_DAY})")
                 port["current_regime"] = active_regime
                 save_portfolio(port)
                 return
@@ -3304,7 +3304,7 @@ def run_cycle():
             target_btc_value = max(min_target, min(max_target, target_btc_value))
             
             if abs(tilt) > 0.01:
-                log(f"  🎯 Kelly governor: baseline {baseline_pct:.0%} ± {tilt:.1%} "
+                log(f"   Kelly governor: baseline {baseline_pct:.0%} ± {tilt:.1%} "
                     f"(half-Kelly {sizing['kelly']['half_kelly']:.1%} × conf {debate_conf:.2f}) "
                     f"→ target capped {target_btc_value/equity*100:.0f}%")
         except ImportError:
@@ -3331,23 +3331,23 @@ def run_cycle():
             buyback_suppressed and drift_pct > 0.20 and hours_since_trim >= 6
         )
         if emergency_override:
-            log(f"  🚨 Emergency drift override: drift {drift_pct*100:.1f}% > 20%, "
+            log(f"   Emergency drift override: drift {drift_pct*100:.1f}% > 20%, "
                 f"trim was {hours_since_trim:.1f}h ago — allowing buyback")
         if delta_usd > 0 and buyback_suppressed and not emergency_override:
-            log(f"  🛡️ Buyback suppressed — drawdown trim {hours_since_trim:.1f}h ago "
+            log(f"   Buyback suppressed — drawdown trim {hours_since_trim:.1f}h ago "
                 f"(< {DRAWDOWN_TRIM_BUYBACK_SUPPRESS_HOURS}h). Drift {drift_pct*100:.1f}%. "
                 f"Holding defensive posture, no rebuy.")
             port["current_regime"] = active_regime
             save_portfolio(port)
             return
         if delta_usd > 0 and port["cash"] >= 10:
-            log(f"📈 Increase BTC allocation by ${delta_usd:.2f} (regime {active_regime}, target {target_alloc*100:.0f}%)")
+            log(f" Increase BTC allocation by ${delta_usd:.2f} (regime {active_regime}, target {target_alloc*100:.0f}%)")
             buy_amt = min(delta_usd, port["cash"] * 0.95)
             if buy_btc(port, price, buy_amt, reason=f"rebalance_to_{active_regime}"):
                 port["n_rebalances"] += 1
                 executed = True
         elif delta_usd < 0 and port["btc_qty"] > 0:
-            log(f"📉 Reduce BTC allocation by ${abs(delta_usd):.2f} (regime {active_regime}, target {target_alloc*100:.0f}%)")
+            log(f" Reduce BTC allocation by ${abs(delta_usd):.2f} (regime {active_regime}, target {target_alloc*100:.0f}%)")
             sell_qty = abs(delta_usd) / price
             if sell_btc(port, price, sell_qty, reason=f"rebalance_to_{active_regime}"):
                 port["n_rebalances"] += 1
@@ -3368,14 +3368,14 @@ def run_cycle():
         from quantforge_prehedge import run_prehedge_cycle
         prehedge_result = run_prehedge_cycle(port, price, equity)
         if prehedge_result["action"] in ("open", "close"):
-            log(f"  🛡️ Pre-hedge: {prehedge_result['detail']}")
+            log(f"   Pre-hedge: {prehedge_result['detail']}")
             save_portfolio(port)  # persist immediately so close/open is durable
         elif prehedge_result["action"] != "idle":
-            log(f"  🛡️ Pre-hedge: {prehedge_result['detail']}")
+            log(f"   Pre-hedge: {prehedge_result['detail']}")
     except ImportError:
         pass  # pre-hedge module not installed — skip silently
     except Exception as e:
-        log(f"  ⚠️ Pre-hedge error: {e} — skipping, fall through to futures")
+        log(f"   Pre-hedge error: {e} — skipping, fall through to futures")
 
     # === Futures lane execution (v7) ===
     _execute_futures(port, price, futures_dir, active_regime, equity, signals, consensus)
@@ -3426,7 +3426,7 @@ def run_cycle():
             ph_upnl = pct_ph * notional_ph
         ph_val = ph_margin + ph_upnl
     futures_pnl = port.get('futures_pnl', 0) + f_upnl  # realized + unrealized PnL only, no margin
-    log(f"  📊 Components: spot=${spot_val:,.2f} futures=${futures_pnl:+.2f} prehedge=${ph_val:+.2f} alts=${alt_value:,.2f} cash=${port.get('cash',0):,.2f} btc_qty={port.get('btc_qty',0):.6f} btc_price=${price:,.2f}")
+    log(f"   Components: spot=${spot_val:,.2f} futures=${futures_pnl:+.2f} prehedge=${ph_val:+.2f} alts=${alt_value:,.2f} cash=${port.get('cash',0):,.2f} btc_qty={port.get('btc_qty',0):.6f} btc_price=${price:,.2f}")
 
     # === Self-detection: money-conservation invariants (fail-safe; never breaks the cycle) ===
     # The layer that was missing when the margin-orphan bug bled silently for weeks. Runs
@@ -3438,17 +3438,17 @@ def run_cycle():
         from quantforge_invariants import evaluate as _inv_evaluate
         _inv_vios, _ = _inv_evaluate(port, price)
         for _v in _inv_vios:
-            log(f"  🔎 INVARIANT [{_v.severity}] {_v.name}: {_v.detail}")
+            log(f"   INVARIANT [{_v.severity}] {_v.name}: {_v.detail}")
         _critical_inv = [v for v in _inv_vios if v.severity == "critical"]
         if _critical_inv and not port.get("futures_kill"):
             _close_futures_position(port, price, "critical_invariant")
             port["futures_kill"] = True
             port["futures_kill_reason"] = "invariant:" + _critical_inv[0].name
-            log("  🛡️ SELF-HEAL: critical invariant breach -> futures lane HALTED "
+            log("   SELF-HEAL: critical invariant breach -> futures lane HALTED "
                 f"(futures_kill, trigger={_critical_inv[0].name}). Reversible via panic-reset; escalated to report/self-heal.")
             save_portfolio(port)
     except Exception as _inv_e:
-        log(f"  ⚠️ invariant self-check skipped: {str(_inv_e)[:120]}")
+        log(f"   invariant self-check skipped: {str(_inv_e)[:120]}")
 
     # === Self-evolution: bleeding detection + fix generation (v15) ===
     # If this cycle triggered a bleed (rapid DD increase or PnL drop),
@@ -3472,7 +3472,7 @@ def run_cycle():
             fixes = generate_fix(bleed, bleed.diagnosis)
             if fixes:
                 add_rules(fixes)
-                log(f"  🧬 Evolution: detected bleed ({bleed.trigger}), diagnosed: {bleed.diagnosis[:80]}, generated {len(fixes)} fix(es)")
+                log(f"   Evolution: detected bleed ({bleed.trigger}), diagnosed: {bleed.diagnosis[:80]}, generated {len(fixes)} fix(es)")
     except ImportError:
         pass
 
@@ -3722,14 +3722,14 @@ def run_cycle():
                 pass
 
         if force_agi:
-            log(f"  ⚡ Perf watchdog: {'; '.join(reasons)} → forcing tuner cycle")
+            log(f"   Perf watchdog: {'; '.join(reasons)} → forcing tuner cycle")
             if retire_names:
-                log(f"  🚫 Strategy retire flagged: {', '.join(retire_names)}")
+                log(f"   Strategy retire flagged: {', '.join(retire_names)}")
             run_agi_cycle(force=True)
             # Trigger alert agent with BOTH degradation + opportunity reasons
             _trigger_alert_monitor(reasons + alert_reasons, _cd)
         elif alert_reasons:
-            log(f"  🔔 alert agent trigger: {'; '.join(alert_reasons)}")
+            log(f"   alert agent trigger: {'; '.join(alert_reasons)}")
             _trigger_alert_monitor(alert_reasons, _cd)
         else:
             run_agi_cycle()
@@ -3765,16 +3765,16 @@ def run_cycle():
         )
 
         if health.status != "healthy":
-            log(f"  🩺 Health: {health.status.upper()}")
+            log(f"   Health: {health.status.upper()}")
             for alert in health.alerts:
-                log(f"    {'🚨' if 'CRITICAL' in alert else '⚠️'} {alert}")
+                log(f"    {'' if 'CRITICAL' in alert else ''} {alert}")
 
         if health.recovery_level > 0:
-            log(f"  🩺 Auto-recovery L{health.recovery_level}: {health.recovery_reason}")
+            log(f"   Auto-recovery L{health.recovery_level}: {health.recovery_reason}")
             params_file = _os.path.join(_os.path.expanduser("~/quantforge/data/quantforge"), "qf_strategy_params.json")
             apply_recovery(health.recovery_level, health.recovery_reason, port, params_file)
             if health.recovery_level >= 3:
-                log(f"  🩺 CRITICAL: halt triggered by self-healing. Review required.")
+                log(f"   CRITICAL: halt triggered by self-healing. Review required.")
                 return  # Don't save portfolio — halt takes precedence
 
         # Save health state for next cycle
@@ -3843,8 +3843,8 @@ def run_cycle():
 
         if action != "no_change":
             level_names = {0: "INACTIVE", 1: "SHADOW", 2: "ACTIVE", 3: "DOMINANT"}
-            icons = {0: "🔴", 1: "🟡", 2: "🟢", 3: "🟣"}
-            log(f"  Debate gate: {icons.get(new_level, '❓')} {action.upper()} → {level_names.get(new_level, '?')} (L{new_level})")
+            icons = {0: "", 1: "", 2: "", 3: ""}
+            log(f"  Debate gate: {icons.get(new_level, '')} {action.upper()} → {level_names.get(new_level, '?')} (L{new_level})")
             log(f"    Reason: {reason}")
     except ImportError:
         pass  # Gate module not available — skip silently
@@ -3894,13 +3894,13 @@ def cmd_status():
         try:
             with open(HALT_FILE) as f:
                 halt_info = json.load(f)
-            print(f"  🚨 STATUS:          HALTED ({halt_info.get('reason', '?')})")
+            print(f"   STATUS:          HALTED ({halt_info.get('reason', '?')})")
             print(f"  Halted at:         {halt_info.get('halted_at', '?')}")
             print(f"  Equity at halt:    ${halt_info.get('equity', 0):,.2f}  (DD {halt_info.get('drawdown_pct', 0)}%)")
             print(f"  Resume with:       python3 quantforge_agent.py panic-reset")
             print("-" * 64)
         except Exception:
-            print(f"  🚨 STATUS:          HALTED (marker unreadable)")
+            print(f"   STATUS:          HALTED (marker unreadable)")
             print("-" * 64)
     print(f"  Mode:              {'HODL_MODE (regime observed, not acted on)' if HODL_MODE else 'REGIME_ACTIVE'}")
     print(f"  Regime:            {port.get('current_regime', '?')}")
@@ -3987,7 +3987,7 @@ def cmd_perf():
         total_our += our
         total_hodl += hodl
         total_alpha += alpha
-        marker = "✅" if alpha > 0 else ("⚠️" if alpha < -2 else "  ")
+        marker = "" if alpha > 0 else ("" if alpha < -2 else "  ")
         print(f"  {regime:<14} {b['visits']:>7d} {b['hours']:>6.1f}h {our:>+12.2f} {hodl:>+12.2f} {alpha:>+12.2f} {marker}")
     print("  " + "-" * 74)
     print(f"  {'TOTAL':<14} {'':>7} {'':>7} {total_our:>+12.2f} {total_hodl:>+12.2f} {total_alpha:>+12.2f}")
@@ -4044,9 +4044,9 @@ def cmd_panic_reset():
         try:
             port["peak_equity"] = _true_equity(port, get_btc_price())
         except Exception as e:
-            print(f"⚠️ Could not refresh peak_equity ({e}) — reset it manually if breakers re-trip")
+            print(f" Could not refresh peak_equity ({e}) — reset it manually if breakers re-trip")
         save_portfolio(port)
-    print("✅ Panic halt cleared. Next cron tick will resume normal trading.")
+    print(" Panic halt cleared. Next cron tick will resume normal trading.")
 
 
 def cmd_topup():
@@ -4132,7 +4132,7 @@ def cmd_topup():
     print(f"  New equity:    ${new_equity:,.2f}")
     print(f"  New balance:   ${new_equity:,.2f}")
     print("=" * 64)
-    print("✅ Topup complete. Panic halt cleared. Next cron tick resumes trading.")
+    print(" Topup complete. Panic halt cleared. Next cron tick resumes trading.")
     print(f"   Regime-adaptive weights will auto-swap for current regime.")
 
 
@@ -4152,7 +4152,7 @@ def cmd_strategies():
     print(f"  Active strategies: {len(STRATEGY_REGISTRY)}  |  spot weight: {(sum(s.weight for s in STRATEGY_REGISTRY if s.name != 'futures_lane'))*100:.0f}%  |  futures margin: {FUTURES_WEIGHT*100:.0f}%")
     spot_weights = sum(s.weight for s in STRATEGY_REGISTRY if s.name != "futures_lane")
     if abs(spot_weights - 1.0) > 1e-6:
-        print(f"  ⚠️  WARNING: spot weights sum to {spot_weights*100:.0f}% (should be 100%)")
+        print(f"    WARNING: spot weights sum to {spot_weights*100:.0f}% (should be 100%)")
     print()
     # Live evaluation — pull market state and ask each strategy
     try:
@@ -4237,7 +4237,7 @@ def _trigger_alert_monitor(reasons, cooldown_h=3.0):
     }
     with open(trigger_file, "w") as f:
         _json.dump(payload, f)
-    log(f"  📡 alert agent monitor trigger written → LLM analysis queued (cooldown={cooldown_h}h)")
+    log(f"   alert agent monitor trigger written → LLM analysis queued (cooldown={cooldown_h}h)")
 
 
 if __name__ == "__main__":

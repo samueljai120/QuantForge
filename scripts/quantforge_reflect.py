@@ -147,7 +147,7 @@ def load_portfolio() -> dict | None:
         with open(PORTFOLIO_FILE) as f:
             return json.load(f)
     except Exception as e:
-        log(f"⚠️ Could not load portfolio: {e}")
+        log(f" Could not load portfolio: {e}")
         return None
 
 
@@ -188,7 +188,7 @@ def load_current_params() -> dict:
                 if k in TUNABLES:
                     params[k] = v
         except Exception as e:
-            log(f"⚠️ Could not load params file: {e}; using defaults")
+            log(f" Could not load params file: {e}; using defaults")
     return params
 
 
@@ -303,7 +303,7 @@ def call_llm(system: str, user: str) -> tuple[dict, str]:
     try:
         return call_openrouter(system, user), "openrouter"
     except Exception as e:
-        log(f"  ⚠️ OpenRouter failed ({e}); trying Anthropic direct...")
+        log(f"   OpenRouter failed ({e}); trying Anthropic direct...")
         return call_anthropic(system, user), "anthropic"
 
 
@@ -770,7 +770,7 @@ def main() -> int:
 
     portfolio = load_portfolio()
     if portfolio is None:
-        log("⚠️ No portfolio file yet — nothing to reflect on. Exiting.")
+        log(" No portfolio file yet — nothing to reflect on. Exiting.")
         return 0
 
     recent_log = load_recent_log(hours=168)
@@ -794,7 +794,7 @@ def main() -> int:
         elapsed = time.time() - t0
         log(f"  Got response from {provider} in {elapsed:.1f}s")
     except Exception as e:
-        log(f"❌ LLM call failed (both providers): {e}")
+        log(f" LLM call failed (both providers): {e}")
         append_decision({
             "ts": datetime.now(timezone.utc).isoformat(),
             "error": str(e),
@@ -806,7 +806,7 @@ def main() -> int:
     proposal = extract_json(text)
 
     if proposal is None:
-        log(f"❌ Could not parse JSON from response. First 500 chars: {text[:500]}")
+        log(f" Could not parse JSON from response. First 500 chars: {text[:500]}")
         append_decision({
             "ts": datetime.now(timezone.utc).isoformat(),
             "raw_text": text[:2000],
@@ -850,7 +850,7 @@ def main() -> int:
 
     # Apply or stop at training wheels
     if not auto_apply:
-        log(f"  📋 Training wheels active — proposal LOGGED but NOT APPLIED.")
+        log(f"   Training wheels active — proposal LOGGED but NOT APPLIED.")
         log(f"     {prior_count + 1}/{TRAINING_WHEELS_RUNS} runs before auto-apply available.")
         log(f"     To enable: touch {AUTO_APPLY_FLAG}")
         append_decision(record)
@@ -891,23 +891,23 @@ def main() -> int:
         if not gate_output.get("approved", True):
             record["gate_blocked"] = True
             record["gate_reason"] = gate_output.get("reason", "unknown")
-            log(f"  🛑 Backtesting gate BLOCKED: {gate_output.get('reason')}")
+            log(f"   Backtesting gate BLOCKED: {gate_output.get('reason')}")
             log(f"     Metrics: {json.dumps(gate_output.get('metrics', {}))}")
             append_decision(record)
             log("=== Reflect cycle end (gate blocked) ===")
             return 0
 
-        log(f"  ✅ Backtesting gate PASSED: {gate_output.get('reason')}")
+        log(f"   Backtesting gate PASSED: {gate_output.get('reason')}")
         log(f"     Metrics: current PnL {gate_output['metrics'].get('current_pnl_pct', 0):+.1f}% → "
             f"proposed {gate_output['metrics'].get('proposed_pnl_pct', 0):+.1f}%")
         
         apply_params(proposal)
         record["applied"] = True
         record["gate_metrics"] = gate_output.get("metrics", {})
-        log(f"  ✅ Applied: {proposal['param']} → {proposal['proposed_value']}")
+        log(f"   Applied: {proposal['param']} → {proposal['proposed_value']}")
     except Exception as e:
         record["apply_error"] = str(e)
-        log(f"❌ Apply failed: {e}")
+        log(f" Apply failed: {e}")
 
     append_decision(record)
     log("=== Reflect cycle end ===")

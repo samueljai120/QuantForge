@@ -307,7 +307,7 @@ def format_text(r):
 
     pnl_sign  = "+" if a["total_pnl"] >= 0 else ""
     day_sign  = "+" if tr["last_24h_pnl"] >= 0 else ""
-    gate_flag = "✓ PASS" if m["gate_pass"] else "✗ FAIL"
+    gate_flag = " PASS" if m["gate_pass"] else " FAIL"
 
     lines = [
         "=" * 55,

@@ -259,14 +259,14 @@ def apply_best_if_known(regime):
             json.dump(best_out, f, indent=2)
 
         print(
-            f"[param_memory] ✅ Applied best params for {regime}: "
+            f"[param_memory]  Applied best params for {regime}: "
             f"alpha {current_alpha:.2f} → recalled {best_alpha:.2f} "
             f"(gate: {reason[:60]})"
         )
         return True
 
     except (IOError, OSError) as e:
-        print(f"[param_memory] ❌ Failed to write params file: {e}")
+        print(f"[param_memory]  Failed to write params file: {e}")
         return False
 
 
@@ -289,27 +289,27 @@ def _test():
 
     save_snapshot(test_regime, test_params, test_metrics)
     assert os.path.exists(MEMORY_FILE), "Memory file was not created"
-    print("  ✅ save_snapshot() created memory file")
+    print("   save_snapshot() created memory file")
 
     # 3. Test get_best_params
     best = get_best_params(test_regime)
     assert best is not None, "get_best_params returned None"
     assert best.get("fixed_alloc_pct") == 0.5, f"Unexpected params: {best}"
-    print(f"  ✅ get_best_params() returned correct params: {best}")
+    print(f"   get_best_params() returned correct params: {best}")
 
     # 4. Test get_best_params for unknown regime
     assert get_best_params("NONEXISTENT") is None, "Should return None for unknown regime"
-    print("  ✅ get_best_params() returns None for unknown regime")
+    print("   get_best_params() returns None for unknown regime")
 
     # 5. Test _count_snapshots
     count = _count_snapshots(test_regime)
     assert count == 1, f"Expected 1 snapshot, got {count}"
-    print(f"  ✅ _count_snapshots({test_regime}) = {count}")
+    print(f"   _count_snapshots({test_regime}) = {count}")
 
     # 6. Test apply_best_if_known (should return False — not enough data)
     result = apply_best_if_known(test_regime)
     assert result is False, f"apply_best_if_known should return False with <3 snapshots, got {result}"
-    print("  ✅ apply_best_if_known() correctly skipped (insufficient data)")
+    print("   apply_best_if_known() correctly skipped (insufficient data)")
 
     # 7. Clean up test data from memory file
     # Remove the test snapshot we just added
@@ -324,9 +324,9 @@ def _test():
                 lines.append(line)
     with open(MEMORY_FILE, "w") as f:
         f.writelines(lines)
-    print("  ✅ Test data cleaned up")
+    print("   Test data cleaned up")
 
-    print("\n[param_memory] ✅ All tests passed — import and API work correctly.")
+    print("\n[param_memory]  All tests passed — import and API work correctly.")
 
 
 # ── CLI entry ──────────────────────────────────────────────────────────────

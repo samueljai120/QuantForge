@@ -349,11 +349,11 @@ def audit() -> list[dict]:
     print("=" * 80)
     retireable = [r for r in results if r["status"] == "RETIRE"]
     if retireable:
-        print(f"  ⚠️  {len(retireable)} strategies eligible for retirement:")
+        print(f"    {len(retireable)} strategies eligible for retirement:")
         for r in retireable:
             print(f"     • {r['name']}: {r['retire_reason']}")
     else:
-        print(f"  ✅ All {len(results)} strategies healthy — no retirements needed")
+        print(f"   All {len(results)} strategies healthy — no retirements needed")
     print()
 
     return results
@@ -385,7 +385,7 @@ def retire(dry_run: bool = True) -> list[str]:
             with open(PARAMS_FILE) as f:
                 params = json.load(f)
         except Exception as e:
-            print(f"  ⚠️  Could not load {PARAMS_FILE}: {e}")
+            print(f"    Could not load {PARAMS_FILE}: {e}")
             return []
 
     # Load retired list
@@ -403,7 +403,7 @@ def retire(dry_run: bool = True) -> list[str]:
         if key and key in params:
             old = params[key]
             params[key] = 0.0
-            print(f"  🚫 Retired {rname}: {key} {old} → 0.0")
+            print(f"   Retired {rname}: {key} {old} → 0.0")
             modified = True
         elif key and rname not in PARAMS_WEIGHT_KEYS:
             # auto-generated strategy — might have its own weight key
@@ -411,7 +411,7 @@ def retire(dry_run: bool = True) -> list[str]:
             if gen_key in params:
                 old = params[gen_key]
                 params[gen_key] = 0.0
-                print(f"  🚫 Retired {rname}: {gen_key} {old} → 0.0")
+                print(f"   Retired {rname}: {gen_key} {old} → 0.0")
                 modified = True
 
         # Zero out in regime_weight_table
@@ -441,7 +441,7 @@ def retire(dry_run: bool = True) -> list[str]:
                 table_modified = True
 
         if table_modified:
-            print(f"  🚫 Zeroed {rname} in regime_weight_table")
+            print(f"   Zeroed {rname} in regime_weight_table")
             modified = True
 
         # Add to retired list
@@ -461,20 +461,20 @@ def retire(dry_run: bool = True) -> list[str]:
         try:
             import shutil
             shutil.copy2(PARAMS_FILE, backup_path)
-            print(f"  📋 Backup saved: {backup_path}")
+            print(f"   Backup saved: {backup_path}")
         except Exception as e:
-            print(f"  ⚠️  Could not backup: {e}")
+            print(f"    Could not backup: {e}")
 
         with open(PARAMS_FILE, "w") as f:
             json.dump(params, f, indent=2)
-        print(f"\n  ✅ Retired {len(retired_names)} strategies, params updated: {PARAMS_FILE}")
+        print(f"\n   Retired {len(retired_names)} strategies, params updated: {PARAMS_FILE}")
     else:
-        print(f"  ℹ️  No params changes needed (weights may be hardcoded in source)")
+        print(f"  ℹ  No params changes needed (weights may be hardcoded in source)")
 
     # For hardcoded strategies, note them
     hardcoded_retired = [r for r in retired_names if r in HARDCODED_WEIGHTS]
     if hardcoded_retired:
-        print(f"\n  ⚠️  {len(hardcoded_retired)} retired strategies have hardcoded weights in quantforge_agent.py:")
+        print(f"\n    {len(hardcoded_retired)} retired strategies have hardcoded weights in quantforge_agent.py:")
         for hr in hardcoded_retired:
             print(f"     • {hr}: weight {HARDCODED_WEIGHTS[hr]} hardcoded in _rebuild_strategy_registry()")
         print(f"     → These need manual code removal or a params-based override guard.")
@@ -497,7 +497,7 @@ def trigger_alert(retired_names: list[str]) -> None:
     }
     with open(trigger_file, "w") as f:
         json.dump(payload, f)
-    print(f"  📡 alert agent monitor trigger written for retirement review")
+    print(f"   alert agent monitor trigger written for retirement review")
 
 
 # ── Wire-in helpers for quantforge_agent.py ──────────────────────────

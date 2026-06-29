@@ -356,7 +356,7 @@ def main():
             "slice_profile_summary": slice_summary,
         }
         json.dump(verdict, open(VERDICT_PATH, "w"), indent=2)
-        log(f"⛔ {verdict['reason']}")
+        log(f" {verdict['reason']}")
         sys.exit(1)
 
     df = add_rank_features(df)
@@ -369,7 +369,7 @@ def main():
             log(f"  macro features: +{len(macro_added)} cols, "
                 f"{cov:.1%} of rows have macro (rest NaN, routed natively)")
         except Exception as e:
-            log(f"  ⚠️ macro merge failed ({e}) — continuing without macro")
+            log(f"   macro merge failed ({e}) — continuing without macro")
 
     feature_cols = select_features(df)
 
@@ -483,7 +483,7 @@ def main():
     log(f"  verdict: {VERDICT_PATH}")
     log(f"\n  ══ REBUILD VERDICT: {'PASS — promotion candidate' if gate_pass else 'FAIL — lane stays frozen'} ══")
     for k, v in gates.items():
-        log(f"    {'✓' if v else '✗'} {k}")
+        log(f"    {'' if v else ''} {k}")
     log(f"  done in {(time.time() - t0) / 60:.1f} min")
     sys.exit(0 if gate_pass else 1)
 

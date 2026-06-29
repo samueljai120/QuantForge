@@ -200,10 +200,10 @@ def close_position(s, exit_price, reason, pnl_margin_pct):
     if s["consecutive_losses"] >= FREEZE_AFTER_LOSSES:
         until = (datetime.now(timezone.utc) + timedelta(days=FREEZE_DAYS)).isoformat()
         s["frozen_until"] = until
-        log(f"  ❄️ {FREEZE_AFTER_LOSSES} consecutive losses — frozen until {until[:10]}")
+        log(f"   {FREEZE_AFTER_LOSSES} consecutive losses — frozen until {until[:10]}")
     if s["balance"] < s["starting_balance"] * DEAD_FLOOR_FRAC:
         s["dead"] = True
-        log(f"  💀 sleeve below {DEAD_FLOOR_FRAC:.0%} of start — DEAD until "
+        log(f"   sleeve below {DEAD_FLOOR_FRAC:.0%} of start — DEAD until "
             f"governance review (budgeted loss realized; no auto-refill)")
 
 
@@ -261,7 +261,7 @@ def run():
         f"(start ${s['starting_balance']:.2f}) ===")
 
     if s["dead"]:
-        log("  💀 sleeve dead — awaiting governance review/refill decision")
+        log("   sleeve dead — awaiting governance review/refill decision")
         save_state(s)
         return
 
@@ -274,7 +274,7 @@ def run():
 
     if s["frozen_until"]:
         if datetime.fromisoformat(s["frozen_until"]) > datetime.now(timezone.utc):
-            log(f"  ❄️ frozen until {s['frozen_until'][:16]}")
+            log(f"   frozen until {s['frozen_until'][:16]}")
             save_state(s)
             return
         s["frozen_until"] = None
@@ -312,7 +312,7 @@ def run():
         "opened_at": now_iso(),
         "signal": detail,
     }
-    log(f"  🚀 OPEN {direction} | margin ${margin:.2f} | notional "
+    log(f"   OPEN {direction} | margin ${margin:.2f} | notional "
         f"${margin * LEVERAGE:,.2f} (10x paper) @ {price:,.1f}")
     log(f"     signal: {detail}")
     save_state(s)
