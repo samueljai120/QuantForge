@@ -157,6 +157,15 @@ QuantForge/
   setup.sh · .env.example · CLAUDE.md · CONTRIBUTING.md
 ```
 
+## Known trade-offs & what I'd refactor next
+
+Honest notes on where the code is and isn't ideal — the kind of thing I'd raise in review:
+
+- **`quantforge_agent.py` and `quantforge_paper.py` are large** (~4k and ~5k lines). The newer `qf_safety/` and `qf_mlops/` packages are the target decomposition — small, single-responsibility modules with their own tests. The agent/engine grew first and didn't get the same treatment.
+- **Strategy registry extraction.** The 14 strategy classes in `quantforge_agent.py` should live in their own `quantforge_strategies` module. The clean path isn't a straight cut: they're coupled to ~20 shared regime/allocation constants and a few agent helpers (e.g. `_execute_ml_positions`), so the right refactor first lifts those into a shared base module, *then* moves the strategies — otherwise you just trade a monolith for a circular import.
+- **Single-venue data.** Market data comes through one KuCoin adapter. A venue-abstraction layer would generalize the platform and make the data source swappable.
+- **Backtest fidelity.** Execution cost is modeled (`qf_mlops/cost_floor`, `execution_realism`), but fills are bar-close approximations — no order-book-level slippage simulation. Adequate for the edge-vs-cost screening this does; not for HFT-scale claims.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
